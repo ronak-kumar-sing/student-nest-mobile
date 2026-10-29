@@ -1,0 +1,16 @@
+appId: com.studentnest.app.dev
+---
+# Smoke test: App launch, tabs navigation, and property detail
+- launchApp
+- assertVisible: "Find your perfect room"
+- tapOn: "Skip to Browse"
+- assertVisible: "Find Your Nest"
+- assertVisible: "Verified Rooms Available"
+- tapOn: "Saved"
+- assertVisible: "Saved"
+- tapOn: "Activity"
+- assertVisible: "Activity"
+- tapOn: "Inbox"
+- assertVisible: "Inbox"
+- tapOn: "Profile"
+- assertVisible: "Profile"
