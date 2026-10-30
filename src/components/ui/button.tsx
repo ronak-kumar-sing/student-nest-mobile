@@ -1,38 +1,30 @@
 import React from 'react';
-import {
-  ActivityIndicator,
-  Pressable,
-  Text,
-  type PressableProps,
-} from 'react-native';
+import { ActivityIndicator, Pressable, Text, type PressableProps } from 'react-native';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/cn';
 
 /* ─────────────────────────── variants ─────────────────────────── */
 
-const buttonVariants = cva(
-  'flex-row items-center justify-center rounded-md',
-  {
-    variants: {
-      variant: {
-        default: 'bg-primary active:opacity-90',
-        secondary: 'bg-secondary active:opacity-90',
-        destructive: 'bg-destructive active:opacity-90',
-        outline: 'border border-border bg-transparent active:bg-accent',
-        ghost: 'bg-transparent active:bg-accent',
-      },
-      size: {
-        sm: 'h-9 px-3 rounded-sm',
-        default: 'h-12 px-5 rounded-md',
-        lg: 'h-14 px-8 rounded-lg',
-      },
+const buttonVariants = cva('flex-row items-center justify-center rounded-md', {
+  variants: {
+    variant: {
+      default: 'bg-primary active:opacity-90',
+      secondary: 'bg-secondary active:opacity-90',
+      destructive: 'bg-destructive active:opacity-90',
+      outline: 'border border-border bg-transparent active:bg-accent',
+      ghost: 'bg-transparent active:bg-accent',
     },
-    defaultVariants: {
-      variant: 'default',
-      size: 'default',
+    size: {
+      sm: 'h-9 px-3 rounded-sm',
+      default: 'h-12 px-5 rounded-md',
+      lg: 'h-14 px-8 rounded-lg',
     },
   },
-);
+  defaultVariants: {
+    variant: 'default',
+    size: 'default',
+  },
+});
 
 const buttonTextVariants = cva('font-heading-semibold text-center', {
   variants: {
@@ -59,9 +51,7 @@ const buttonTextVariants = cva('font-heading-semibold text-center', {
 
 type ButtonVariantProps = VariantProps<typeof buttonVariants>;
 
-interface ButtonProps
-  extends Omit<PressableProps, 'children'>,
-    ButtonVariantProps {
+interface ButtonProps extends Omit<PressableProps, 'children'>, ButtonVariantProps {
   /** Button label or custom content. */
   children: React.ReactNode;
   /** Show an ActivityIndicator and disable interactions. */
@@ -102,11 +92,7 @@ function Button({
       disabled={isDisabled}
       accessibilityRole="button"
       accessibilityState={{ disabled: isDisabled }}
-      className={cn(
-        buttonVariants({ variant, size }),
-        isDisabled && 'opacity-50',
-        className,
-      )}
+      className={cn(buttonVariants({ variant, size }), isDisabled && 'opacity-50', className)}
     >
       {loading ? (
         <ActivityIndicator

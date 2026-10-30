@@ -19,10 +19,10 @@ export default function OwnerListingsScreen() {
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>
       {/* Header */}
-      <View className="px-4 py-3 bg-card border-b border-border flex-row items-center justify-between">
+      <View className="flex-row items-center justify-between border-b border-border bg-card px-4 py-3">
         <View>
-          <Text className="text-h2 font-heading text-foreground">{t('tabs.listings')}</Text>
-          <Text className="text-xs font-body text-muted-foreground">
+          <Text className="font-heading text-h2 text-foreground">{t('tabs.listings')}</Text>
+          <Text className="font-body text-xs text-muted-foreground">
             {listings.length} managed properties
           </Text>
         </View>
@@ -32,7 +32,7 @@ export default function OwnerListingsScreen() {
           className="flex-row items-center"
         >
           <Plus size={16} color="white" className="mr-1" />
-          <Text className="text-xs font-body-semibold text-primary-foreground">Add Listing</Text>
+          <Text className="font-body-semibold text-xs text-primary-foreground">Add Listing</Text>
         </Button>
       </View>
 
@@ -54,38 +54,38 @@ export default function OwnerListingsScreen() {
               <TouchableOpacity
                 key={property.id}
                 onPress={() => router.push(`/property/${property.id}`)}
-                className="bg-card rounded-xl border border-border overflow-hidden shadow-elevation-1"
+                className="shadow-elevation-1 overflow-hidden rounded-xl border border-border bg-card"
                 activeOpacity={0.8}
               >
-                <View className="h-36 w-full bg-muted relative">
+                <View className="relative h-36 w-full bg-muted">
                   <Image
                     source={{ uri: property.images[0] }}
                     style={{ width: '100%', height: '100%' }}
                     contentFit="cover"
                   />
-                  <View className="absolute top-3 left-3">
+                  <View className="absolute left-3 top-3">
                     <StatusPill status={property.status} />
                   </View>
                 </View>
 
                 <View className="p-3.5">
-                  <View className="flex-row items-center justify-between mb-1">
+                  <View className="mb-1 flex-row items-center justify-between">
                     <PriceTag paise={property.rentPaise} size="sm" />
-                    <Text className="text-xs font-body-medium text-muted-foreground capitalize">
+                    <Text className="font-body-medium text-xs capitalize text-muted-foreground">
                       {property.roomType.replace('_', ' ')}
                     </Text>
                   </View>
 
                   <Text
-                    className="text-body font-body-semibold text-foreground mb-1"
+                    className="mb-1 font-body-semibold text-body text-foreground"
                     numberOfLines={1}
                   >
                     {property.title}
                   </Text>
 
                   <View className="flex-row items-center text-muted-foreground">
-                    <MapPin size={12} className="text-muted-foreground mr-1" />
-                    <Text className="text-xs font-body text-muted-foreground">
+                    <MapPin size={12} className="mr-1 text-muted-foreground" />
+                    <Text className="font-body text-xs text-muted-foreground">
                       {property.locality}, {property.city}
                     </Text>
                   </View>

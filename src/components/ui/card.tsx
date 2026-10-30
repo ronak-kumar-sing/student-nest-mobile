@@ -12,12 +12,7 @@ interface CardProps {
 /** Card container with card bg, border, rounded corners, and soft shadow. */
 function Card({ children, className }: CardProps) {
   return (
-    <View
-      className={cn(
-        'rounded-lg border border-border bg-card shadow-elevation-1',
-        className,
-      )}
-    >
+    <View className={cn('shadow-elevation-1 rounded-lg border border-border bg-card', className)}>
       {children}
     </View>
   );
@@ -32,11 +27,7 @@ interface CardHeaderProps {
 
 /** Padded header section of a Card. */
 function CardHeader({ children, className }: CardHeaderProps) {
-  return (
-    <View className={cn('gap-1.5 p-4', className)}>
-      {children}
-    </View>
-  );
+  return <View className={cn('gap-1.5 p-4', className)}>{children}</View>;
 }
 
 /* ─────────────────────────── CardTitle ─────────────────────────── */
@@ -86,11 +77,7 @@ interface CardContentProps {
 
 /** Padded content area of a Card. */
 function CardContent({ children, className }: CardContentProps) {
-  return (
-    <View className={cn('px-4 pb-4', className)}>
-      {children}
-    </View>
-  );
+  return <View className={cn('px-4 pb-4', className)}>{children}</View>;
 }
 
 /* ─────────────────────────── CardFooter ───────────────────────── */
@@ -102,21 +89,10 @@ interface CardFooterProps {
 
 /** Flex-row padded footer of a Card. */
 function CardFooter({ children, className }: CardFooterProps) {
-  return (
-    <View className={cn('flex-row items-center px-4 pb-4', className)}>
-      {children}
-    </View>
-  );
+  return <View className={cn('flex-row items-center px-4 pb-4', className)}>{children}</View>;
 }
 
-export {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-};
+export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter };
 export type {
   CardProps,
   CardHeaderProps,

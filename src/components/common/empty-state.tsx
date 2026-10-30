@@ -28,11 +28,9 @@ export function EmptyState({
           <Icon size={32} className="text-muted-foreground" />
         </View>
       )}
-      <Text className="text-center font-heading text-h3 text-foreground mb-2">
-        {title}
-      </Text>
+      <Text className="mb-2 text-center font-heading text-h3 text-foreground">{title}</Text>
       {description && (
-        <Text className="text-center font-body text-sm text-muted-foreground mb-6 max-w-xs">
+        <Text className="mb-6 max-w-xs text-center font-body text-sm text-muted-foreground">
           {description}
         </Text>
       )}
@@ -44,4 +42,3 @@ export function EmptyState({
     </View>
   );
 }
-

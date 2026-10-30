@@ -114,15 +114,54 @@ export interface MockDB {
 const CITIES = ['Indore', 'Bengaluru', 'Pune'] as const;
 
 const LOCALITIES: Record<(typeof CITIES)[number], string[]> = {
-  Indore: ['Vijay Nagar', 'Palasia', 'Bhawarkua', 'Sapna Sangeeta', 'AB Road', 'Rajwada', 'South Tukoganj', 'Geeta Bhawan'],
-  Bengaluru: ['Koramangala', 'HSR Layout', 'Indiranagar', 'BTM Layout', 'Whitefield', 'Electronic City', 'Jayanagar', 'Marathahalli'],
-  Pune: ['Kothrud', 'Hinjewadi', 'Viman Nagar', 'Koregaon Park', 'Baner', 'Aundh', 'Wakad', 'Hadapsar'],
+  Indore: [
+    'Vijay Nagar',
+    'Palasia',
+    'Bhawarkua',
+    'Sapna Sangeeta',
+    'AB Road',
+    'Rajwada',
+    'South Tukoganj',
+    'Geeta Bhawan',
+  ],
+  Bengaluru: [
+    'Koramangala',
+    'HSR Layout',
+    'Indiranagar',
+    'BTM Layout',
+    'Whitefield',
+    'Electronic City',
+    'Jayanagar',
+    'Marathahalli',
+  ],
+  Pune: [
+    'Kothrud',
+    'Hinjewadi',
+    'Viman Nagar',
+    'Koregaon Park',
+    'Baner',
+    'Aundh',
+    'Wakad',
+    'Hadapsar',
+  ],
 };
 
 const COLLEGES: Record<(typeof CITIES)[number], string[]> = {
   Indore: ['IET-DAVV', 'SGSITS', 'IIT Indore', 'Medicaps University', 'IPS Academy'],
-  Bengaluru: ['IISc Bengaluru', 'RV College', 'BMS College of Engineering', 'PES University', 'Christ University'],
-  Pune: ['COEP Pune', 'MIT-WPU', 'Symbiosis International', 'Fergusson College', 'Bharati Vidyapeeth'],
+  Bengaluru: [
+    'IISc Bengaluru',
+    'RV College',
+    'BMS College of Engineering',
+    'PES University',
+    'Christ University',
+  ],
+  Pune: [
+    'COEP Pune',
+    'MIT-WPU',
+    'Symbiosis International',
+    'Fergusson College',
+    'Bharati Vidyapeeth',
+  ],
 };
 
 const ROOM_TYPES = [
@@ -163,10 +202,10 @@ function generateProperties(): MockProperty[] {
     const roomType = ROOM_TYPES[i % ROOM_TYPES.length]!;
     const rentPaise = 400000 + ((i * 35000 + 17000) % 2100000);
     const depositPaise = rentPaise * 2;
-    const maintenancePaise = (i % 3 === 0) ? 50000 : 0;
-    const billsPaise = (i % 2 === 0) ? 30000 : 0;
+    const maintenancePaise = i % 3 === 0 ? 50000 : 0;
+    const billsPaise = i % 2 === 0 ? 30000 : 0;
 
-    const rating = 3.8 + ((i % 12) * 0.1);
+    const rating = 3.8 + (i % 12) * 0.1;
     const roundedRating = Math.min(5.0, Math.round(rating * 10) / 10);
 
     const propertyAmenities = AMENITIES.filter((_, idx) => (i + idx) % 2 === 0);
@@ -182,7 +221,7 @@ function generateProperties(): MockProperty[] {
       locality,
       address: `House #${100 + i}, 4th Cross, ${locality}, ${city}`,
       roomType,
-      genderPolicy: (i % 3 === 0) ? 'female' : (i % 3 === 1) ? 'male' : 'unisex',
+      genderPolicy: i % 3 === 0 ? 'female' : i % 3 === 1 ? 'male' : 'unisex',
       status: i < 52 ? 'published' : i < 56 ? 'pending_review' : 'draft',
       ownerId: i % 2 === 0 ? 'owner-1' : 'owner-2',
       images: [
@@ -193,7 +232,10 @@ function generateProperties(): MockProperty[] {
       amenities: propertyAmenities,
       rating: roundedRating,
       reviewCount: 4 + (i % 15),
-      nearbyColleges: [cityColleges[i % cityColleges.length]!, cityColleges[(i + 1) % cityColleges.length]!],
+      nearbyColleges: [
+        cityColleges[i % cityColleges.length]!,
+        cityColleges[(i + 1) % cityColleges.length]!,
+      ],
     });
   }
 
@@ -210,7 +252,8 @@ function createInitialDB(): MockDB {
         email: 'rahul.sharma@example.com',
         displayName: 'Rahul Sharma',
         role: 'student',
-        avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&auto=format&fit=crop&q=80',
+        avatarUrl:
+          'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&auto=format&fit=crop&q=80',
         phone: '+919876543210',
         isVerified: true,
       },
@@ -219,7 +262,8 @@ function createInitialDB(): MockDB {
         email: 'priya.patel@example.com',
         displayName: 'Priya Patel',
         role: 'student',
-        avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&auto=format&fit=crop&q=80',
+        avatarUrl:
+          'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&auto=format&fit=crop&q=80',
         phone: '+919876543211',
         isVerified: false,
       },
@@ -228,7 +272,8 @@ function createInitialDB(): MockDB {
         email: 'amit.kumar@example.com',
         displayName: 'Amit Kumar',
         role: 'owner',
-        avatarUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&auto=format&fit=crop&q=80',
+        avatarUrl:
+          'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&auto=format&fit=crop&q=80',
         phone: '+919876543212',
         isVerified: true,
       },
@@ -237,7 +282,8 @@ function createInitialDB(): MockDB {
         email: 'sunita.devi@example.com',
         displayName: 'Sunita Devi',
         role: 'owner',
-        avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&auto=format&fit=crop&q=80',
+        avatarUrl:
+          'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&auto=format&fit=crop&q=80',
         phone: '+919876543213',
         isVerified: false,
       },
@@ -257,7 +303,12 @@ function createInitialDB(): MockDB {
         createdAt: '2026-10-25T10:00:00.000Z',
         history: [
           { status: 'pending', at: '2026-10-25T10:00:00.000Z', by: 'student-1' },
-          { status: 'approved', at: '2026-10-26T14:30:00.000Z', by: 'owner-1', note: 'Welcome to Student Nest!' },
+          {
+            status: 'approved',
+            at: '2026-10-26T14:30:00.000Z',
+            by: 'owner-1',
+            note: 'Welcome to Student Nest!',
+          },
         ],
       },
       {
@@ -271,9 +322,7 @@ function createInitialDB(): MockDB {
         occupants: 1,
         agreedRentPaise: 1200000,
         createdAt: '2026-10-28T09:15:00.000Z',
-        history: [
-          { status: 'pending', at: '2026-10-28T09:15:00.000Z', by: 'student-1' },
-        ],
+        history: [{ status: 'pending', at: '2026-10-28T09:15:00.000Z', by: 'student-1' }],
       },
     ],
     tours: [
@@ -338,7 +387,8 @@ function createInitialDB(): MockDB {
         studentId: 'student-2',
         studentName: 'Priya Patel',
         rating: 5,
-        comment: 'Very clean place and the owner is cooperative. Great WiFi speeds and peaceful neighborhood.',
+        comment:
+          'Very clean place and the owner is cooperative. Great WiFi speeds and peaceful neighborhood.',
         livedHere: true,
         createdAt: '2026-09-15T12:00:00.000Z',
         ownerReply: {
@@ -406,4 +456,3 @@ export function updateBookingStatus(
     });
   }
 }
-

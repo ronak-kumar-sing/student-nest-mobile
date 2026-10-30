@@ -170,8 +170,7 @@ export async function createApiError(response: Response): Promise<ApiError> {
  * Create a network-level `ApiError` (no response from server).
  */
 export function createNetworkError(error: unknown): ApiError {
-  const message =
-    error instanceof Error ? error.message : 'Network error';
+  const message = error instanceof Error ? error.message : 'Network error';
 
   return new ApiError({
     code: ErrorCodes.NETWORK_ERROR,

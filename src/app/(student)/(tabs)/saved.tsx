@@ -16,9 +16,9 @@ export default function SavedScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>
-      <View className="px-4 py-3 bg-card border-b border-border">
-        <Text className="text-h2 font-heading text-foreground">{t('tabs.saved')}</Text>
-        <Text className="text-xs font-body text-muted-foreground">
+      <View className="border-b border-border bg-card px-4 py-3">
+        <Text className="font-heading text-h2 text-foreground">{t('tabs.saved')}</Text>
+        <Text className="font-body text-xs text-muted-foreground">
           {savedProperties.length} properties saved
         </Text>
       </View>
@@ -41,10 +41,10 @@ export default function SavedScreen() {
               <TouchableOpacity
                 key={property.id}
                 onPress={() => router.push(`/property/${property.id}`)}
-                className="bg-card rounded-xl border border-border overflow-hidden flex-row shadow-elevation-1"
+                className="shadow-elevation-1 flex-row overflow-hidden rounded-xl border border-border bg-card"
                 activeOpacity={0.8}
               >
-                <View className="w-32 h-32 bg-muted relative">
+                <View className="relative h-32 w-32 bg-muted">
                   <Image
                     source={{ uri: property.images[0] }}
                     style={{ width: '100%', height: '100%' }}
@@ -52,25 +52,25 @@ export default function SavedScreen() {
                   />
                 </View>
 
-                <View className="flex-1 p-3 justify-between">
+                <View className="flex-1 justify-between p-3">
                   <View>
                     <PriceTag paise={property.rentPaise} size="sm" />
                     <Text
-                      className="text-sm font-body-semibold text-foreground mt-0.5"
+                      className="mt-0.5 font-body-semibold text-sm text-foreground"
                       numberOfLines={1}
                     >
                       {property.title}
                     </Text>
-                    <View className="flex-row items-center mt-1">
-                      <MapPin size={12} className="text-muted-foreground mr-1" />
-                      <Text className="text-xs font-body text-muted-foreground">
+                    <View className="mt-1 flex-row items-center">
+                      <MapPin size={12} className="mr-1 text-muted-foreground" />
+                      <Text className="font-body text-xs text-muted-foreground">
                         {property.locality}, {property.city}
                       </Text>
                     </View>
                   </View>
 
-                  <View className="flex-row items-center justify-between pt-2 border-t border-border/40">
-                    <Text className="text-xs font-body-medium text-primary">
+                  <View className="flex-row items-center justify-between border-t border-border/40 pt-2">
+                    <Text className="font-body-medium text-xs text-primary">
                       {property.roomType.replace('_', ' ')}
                     </Text>
                     <TouchableOpacity
@@ -91,4 +91,3 @@ export default function SavedScreen() {
     </SafeAreaView>
   );
 }
-

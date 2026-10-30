@@ -49,9 +49,7 @@ export const DEFAULT_PAGE_SIZE = 20;
  *   getNextPageParam: getNextPageParam,
  * });
  */
-export function getNextPageParam<T>(
-  lastPage: PaginatedResponse<T>,
-): string | null | undefined {
+export function getNextPageParam<T>(lastPage: PaginatedResponse<T>): string | null | undefined {
   return lastPage.hasMore ? lastPage.nextCursor : undefined;
 }
 
@@ -62,9 +60,7 @@ export function getNextPageParam<T>(
  * const { data } = useInfinitePropertyList(filters);
  * const allProperties = flattenPages(data?.pages);
  */
-export function flattenPages<T>(
-  pages: PaginatedResponse<T>[] | undefined,
-): T[] {
+export function flattenPages<T>(pages: PaginatedResponse<T>[] | undefined): T[] {
   if (!pages) return [];
   return pages.flatMap((page) => page.items);
 }
@@ -72,9 +68,7 @@ export function flattenPages<T>(
 /**
  * Get the total number of items loaded across all pages.
  */
-export function getTotalLoadedCount<T>(
-  pages: PaginatedResponse<T>[] | undefined,
-): number {
+export function getTotalLoadedCount<T>(pages: PaginatedResponse<T>[] | undefined): number {
   if (!pages) return 0;
   return pages.reduce((total, page) => total + page.items.length, 0);
 }
@@ -82,8 +76,6 @@ export function getTotalLoadedCount<T>(
 /**
  * Check if any page has been loaded (i.e. at least one page with items).
  */
-export function hasLoadedData<T>(
-  pages: PaginatedResponse<T>[] | undefined,
-): boolean {
+export function hasLoadedData<T>(pages: PaginatedResponse<T>[] | undefined): boolean {
   return getTotalLoadedCount(pages) > 0;
 }

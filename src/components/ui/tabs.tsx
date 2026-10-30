@@ -104,9 +104,7 @@ function TabItem({ tab, isActive, onPress }: TabItemProps) {
       <Text
         className={cn(
           'text-sm',
-          isActive
-            ? 'font-body-semibold text-primary'
-            : 'font-body-medium text-muted-foreground',
+          isActive ? 'font-body-semibold text-primary' : 'font-body-medium text-muted-foreground',
         )}
         maxFontSizeMultiplier={1.3}
       >

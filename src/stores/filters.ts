@@ -9,12 +9,7 @@ import { create } from 'zustand';
 
 // ─── Types ──────────────────────────────────────────────────────────
 
-export type SortOption =
-  | 'relevance'
-  | 'price_asc'
-  | 'price_desc'
-  | 'rating'
-  | 'newest';
+export type SortOption = 'relevance' | 'price_asc' | 'price_desc' | 'rating' | 'newest';
 
 export interface FiltersState {
   /** Selected city filter */
@@ -48,7 +43,9 @@ export interface FiltersState {
   sortBy: SortOption;
 
   /** Set a single filter value */
-  setFilter: <K extends keyof Omit<FiltersState, 'setFilter' | 'resetFilters' | 'activeFilterCount'>>(
+  setFilter: <
+    K extends keyof Omit<FiltersState, 'setFilter' | 'resetFilters' | 'activeFilterCount'>,
+  >(
     key: K,
     value: FiltersState[K],
   ) => void;
@@ -80,11 +77,9 @@ const defaultFilters = {
 export const useFiltersStore = create<FiltersState>()((set, get) => ({
   ...defaultFilters,
 
-  setFilter: (key, value) =>
-    set({ [key]: value }),
+  setFilter: (key, value) => set({ [key]: value }),
 
-  resetFilters: () =>
-    set({ ...defaultFilters }),
+  resetFilters: () => set({ ...defaultFilters }),
 
   activeFilterCount: () => {
     const state = get();

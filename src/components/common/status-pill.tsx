@@ -10,6 +10,7 @@ import {
   LucideIcon,
 } from 'lucide-react-native';
 import { cn } from '@/lib/cn';
+import { colors } from '@/theme/tokens';
 
 interface StatusConfig {
   label: string;
@@ -25,63 +26,63 @@ const STATUS_CONFIGS: Record<string, StatusConfig> = {
     badgeClass: 'bg-warning/15 border-warning/30',
     textClass: 'text-warning',
     icon: Clock,
-    iconColor: 'hsl(var(--warning))',
+    iconColor: colors.warning,
   },
   pending_review: {
     label: 'Under Review',
     badgeClass: 'bg-warning/15 border-warning/30',
     textClass: 'text-warning',
     icon: Clock,
-    iconColor: 'hsl(var(--warning))',
+    iconColor: colors.warning,
   },
   approved: {
     label: 'Approved',
     badgeClass: 'bg-success/15 border-success/30',
     textClass: 'text-success',
     icon: CheckCircle2,
-    iconColor: 'hsl(var(--success))',
+    iconColor: colors.success,
   },
   published: {
     label: 'Published',
     badgeClass: 'bg-success/15 border-success/30',
     textClass: 'text-success',
     icon: CheckCircle2,
-    iconColor: 'hsl(var(--success))',
+    iconColor: colors.success,
   },
   confirmed: {
     label: 'Confirmed',
     badgeClass: 'bg-success/15 border-success/30',
     textClass: 'text-success',
     icon: CheckCircle2,
-    iconColor: 'hsl(var(--success))',
+    iconColor: colors.success,
   },
   rejected: {
     label: 'Rejected',
     badgeClass: 'bg-destructive/15 border-destructive/30',
     textClass: 'text-destructive',
     icon: XCircle,
-    iconColor: 'hsl(var(--destructive))',
+    iconColor: colors.destructive,
   },
   cancelled: {
     label: 'Cancelled',
     badgeClass: 'bg-destructive/15 border-destructive/30',
     textClass: 'text-destructive',
     icon: XCircle,
-    iconColor: 'hsl(var(--destructive))',
+    iconColor: colors.destructive,
   },
   draft: {
     label: 'Draft',
     badgeClass: 'bg-muted border-border',
     textClass: 'text-muted-foreground',
     icon: FileEdit,
-    iconColor: 'hsl(var(--muted-foreground))',
+    iconColor: colors.mutedForeground,
   },
   submitted: {
     label: 'Submitted',
     badgeClass: 'bg-info/15 border-info/30',
     textClass: 'text-info',
     icon: Send,
-    iconColor: 'hsl(var(--info))',
+    iconColor: colors.info,
   },
 };
 
@@ -96,7 +97,7 @@ export function StatusPill({ status, className }: StatusPillProps) {
     badgeClass: 'bg-muted border-border',
     textClass: 'text-muted-foreground',
     icon: HelpCircle,
-    iconColor: 'hsl(var(--muted-foreground))',
+    iconColor: colors.mutedForeground,
   };
 
   const Icon = config.icon;
@@ -118,4 +119,3 @@ export function StatusPill({ status, className }: StatusPillProps) {
     </View>
   );
 }
-

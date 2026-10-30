@@ -27,15 +27,12 @@ export function PriceTag({ paise, period = '/month', size = 'default', className
 
   return (
     <View className={cn('flex-row items-baseline', className)}>
-      <Text className={cn('text-primary font-heading', sizeClasses[size])}>
-        {formatted}
-      </Text>
+      <Text className={cn('font-heading text-primary', sizeClasses[size])}>{formatted}</Text>
       {period && (
-        <Text className={cn('text-muted-foreground font-body ml-1', periodClasses[size])}>
+        <Text className={cn('ml-1 font-body text-muted-foreground', periodClasses[size])}>
           {period}
         </Text>
       )}
     </View>
   );
 }
-

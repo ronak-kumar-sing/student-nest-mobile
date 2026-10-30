@@ -66,17 +66,13 @@ export const useDevSettingsStore = create<DevSettingsState>()(
           apiModeOverrides: { ...state.apiModeOverrides, [feature]: mode },
         })),
 
-      setMockLatency: (ms) =>
-        set({ mockLatency: ms }),
+      setMockLatency: (ms) => set({ mockLatency: ms }),
 
-      setForceError: (code) =>
-        set({ forceError: code }),
+      setForceError: (code) => set({ forceError: code }),
 
-      setOffline: (value) =>
-        set({ isOffline: value }),
+      setOffline: (value) => set({ isOffline: value }),
 
-      resetAll: () =>
-        set({ ...defaultSettings }),
+      resetAll: () => set({ ...defaultSettings }),
     }),
     {
       name: 'student-nest-dev-settings',

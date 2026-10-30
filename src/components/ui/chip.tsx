@@ -37,18 +37,14 @@ function Chip({ label, selected = false, onPress, className }: ChipProps) {
       accessibilityState={{ selected }}
       className={cn(
         'items-center justify-center rounded-full px-4 py-2 active:scale-95',
-        selected
-          ? 'bg-primary'
-          : 'bg-secondary',
+        selected ? 'bg-primary' : 'bg-secondary',
         className,
       )}
     >
       <Text
         className={cn(
           'font-body-medium text-sm',
-          selected
-            ? 'text-primary-foreground'
-            : 'text-secondary-foreground',
+          selected ? 'text-primary-foreground' : 'text-secondary-foreground',
         )}
         maxFontSizeMultiplier={1.3}
       >

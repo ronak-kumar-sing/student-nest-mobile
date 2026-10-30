@@ -6,21 +6,18 @@ import { cn } from '@/lib/cn';
 
 /* ─────────────────────────── variants ─────────────────────────── */
 
-const avatarVariants = cva(
-  'items-center justify-center overflow-hidden rounded-full bg-muted',
-  {
-    variants: {
-      size: {
-        sm: 'h-8 w-8',
-        default: 'h-10 w-10',
-        lg: 'h-14 w-14',
-      },
-    },
-    defaultVariants: {
-      size: 'default',
+const avatarVariants = cva('items-center justify-center overflow-hidden rounded-full bg-muted', {
+  variants: {
+    size: {
+      sm: 'h-8 w-8',
+      default: 'h-10 w-10',
+      lg: 'h-14 w-14',
     },
   },
-);
+  defaultVariants: {
+    size: 'default',
+  },
+});
 
 const avatarTextVariants = cva('font-heading text-muted-foreground', {
   variants: {

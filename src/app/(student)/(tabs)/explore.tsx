@@ -7,6 +7,7 @@ import { getDB, MockProperty } from '@/api/mock/db';
 import { PriceTag } from '@/components/common/price-tag';
 import { Chip } from '@/components/ui/chip';
 import { Image } from 'expo-image';
+import { colors } from '@/theme/tokens';
 
 export default function ExploreScreen() {
   const db = getDB();
@@ -29,33 +30,33 @@ export default function ExploreScreen() {
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>
       {/* Header with Search and Dev Menu */}
-      <View className="px-4 pt-2 pb-3 bg-card border-b border-border">
-        <View className="flex-row items-center justify-between mb-3">
+      <View className="border-b border-border bg-card px-4 pb-3 pt-2">
+        <View className="mb-3 flex-row items-center justify-between">
           <View>
-            <Text className="text-h2 font-heading text-foreground">Find Your Nest</Text>
-            <Text className="text-xs font-body text-muted-foreground">
+            <Text className="font-heading text-h2 text-foreground">Find Your Nest</Text>
+            <Text className="font-body text-xs text-muted-foreground">
               Direct from verified owners • 0% Brokerage
             </Text>
           </View>
           <TouchableOpacity
             onPress={() => router.push('/dev')}
-            className="flex-row items-center bg-muted/80 px-2.5 py-1.5 rounded-full"
+            className="flex-row items-center rounded-full bg-muted/80 px-2.5 py-1.5"
             accessibilityLabel="Open Dev Menu"
           >
-            <Wrench size={13} className="text-muted-foreground mr-1" />
-            <Text className="text-xs font-body-medium text-muted-foreground">Dev</Text>
+            <Wrench size={13} className="mr-1 text-muted-foreground" />
+            <Text className="font-body-medium text-xs text-muted-foreground">Dev</Text>
           </TouchableOpacity>
         </View>
 
         {/* Search Bar */}
-        <View className="flex-row items-center bg-muted/70 rounded-xl px-3 py-2 border border-border">
-          <Search size={18} className="text-muted-foreground mr-2" />
+        <View className="flex-row items-center rounded-xl border border-border bg-muted/70 px-3 py-2">
+          <Search size={18} className="mr-2 text-muted-foreground" />
           <TextInput
             placeholder="Search locality, college, city..."
-            placeholderTextColor="hsl(var(--muted-foreground))"
+            placeholderTextColor={colors.mutedForeground}
             value={searchQuery}
             onChangeText={setSearchQuery}
-            className="flex-1 font-body text-sm text-foreground p-0"
+            className="flex-1 p-0 font-body text-sm text-foreground"
           />
           <TouchableOpacity className="p-1">
             <SlidersHorizontal size={16} className="text-foreground" />
@@ -84,16 +85,16 @@ export default function ExploreScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
       >
-        <View className="flex-row items-center justify-between mb-4">
-          <Text className="text-sm font-body-semibold text-foreground">
+        <View className="mb-4 flex-row items-center justify-between">
+          <Text className="font-body-semibold text-sm text-foreground">
             {filteredProperties.length} Verified Rooms Available
           </Text>
           <TouchableOpacity
             onPress={() => router.push('/(student)/(tabs)/activity')}
             className="flex-row items-center"
           >
-            <Users size={14} color="hsl(var(--primary))" className="mr-1" />
-            <Text className="text-xs font-body-semibold text-primary">Find Roommates</Text>
+            <Users size={14} color={colors.primary} className="mr-1" />
+            <Text className="font-body-semibold text-xs text-primary">Find Roommates</Text>
           </TouchableOpacity>
         </View>
 
@@ -102,7 +103,7 @@ export default function ExploreScreen() {
             <TouchableOpacity
               key={property.id}
               onPress={() => router.push(`/property/${property.id}`)}
-              className="bg-card rounded-xl border border-border overflow-hidden shadow-elevation-1"
+              className="shadow-elevation-1 overflow-hidden rounded-xl border border-border bg-card"
               activeOpacity={0.8}
             >
               {/* Cover Image */}
@@ -114,14 +115,14 @@ export default function ExploreScreen() {
                   transition={200}
                 />
                 <TouchableOpacity
-                  className="absolute top-3 right-3 h-8 w-8 rounded-full bg-background/80 backdrop-blur-md items-center justify-center"
+                  className="absolute right-3 top-3 h-8 w-8 items-center justify-center rounded-full bg-background/80 backdrop-blur-md"
                   accessibilityLabel="Save property"
                 >
-                  <Heart size={16} color="hsl(var(--foreground))" />
+                  <Heart size={16} color={colors.foreground} />
                 </TouchableOpacity>
 
-                <View className="absolute bottom-3 left-3 bg-background/90 backdrop-blur-md px-2.5 py-1 rounded-md">
-                  <Text className="text-xs font-body-semibold text-foreground capitalize">
+                <View className="absolute bottom-3 left-3 rounded-md bg-background/90 px-2.5 py-1 backdrop-blur-md">
+                  <Text className="font-body-semibold text-xs capitalize text-foreground">
                     {property.roomType.replace('_', ' ')}
                   </Text>
                 </View>
@@ -129,43 +130,41 @@ export default function ExploreScreen() {
 
               {/* Info Block */}
               <View className="p-3.5">
-                <View className="flex-row items-center justify-between mb-1">
+                <View className="mb-1 flex-row items-center justify-between">
                   <PriceTag paise={property.rentPaise} size="default" />
-                  <View className="flex-row items-center bg-muted px-2 py-0.5 rounded">
-                    <Text className="text-xs font-body-semibold text-foreground">
+                  <View className="flex-row items-center rounded bg-muted px-2 py-0.5">
+                    <Text className="font-body-semibold text-xs text-foreground">
                       ★ {property.rating}
                     </Text>
-                    <Text className="text-xs font-body text-muted-foreground ml-1">
+                    <Text className="ml-1 font-body text-xs text-muted-foreground">
                       ({property.reviewCount})
                     </Text>
                   </View>
                 </View>
 
                 <Text
-                  className="text-body font-body-semibold text-foreground mb-1.5"
+                  className="mb-1.5 font-body-semibold text-body text-foreground"
                   numberOfLines={1}
                 >
                   {property.title}
                 </Text>
 
-                <View className="flex-row items-center text-muted-foreground mb-2">
-                  <MapPin size={13} className="text-muted-foreground mr-1" />
-                  <Text className="text-xs font-body text-muted-foreground">
+                <View className="mb-2 flex-row items-center text-muted-foreground">
+                  <MapPin size={13} className="mr-1 text-muted-foreground" />
+                  <Text className="font-body text-xs text-muted-foreground">
                     {property.locality}, {property.city}
                   </Text>
                 </View>
 
                 {/* Amenities pills */}
-                <View className="flex-row flex-wrap gap-1.5 pt-2 border-t border-border/60">
+                <View className="flex-row flex-wrap gap-1.5 border-t border-border/60 pt-2">
                   {property.amenities.slice(0, 3).map((amenity) => (
-                    <View key={amenity} className="bg-muted px-2 py-0.5 rounded">
-                      <Text className="text-xs font-body text-muted-foreground">
-                        {amenity}
-                      </Text>
+                    <View key={amenity} className="rounded bg-muted px-2 py-0.5">
+                      <Text className="font-body text-xs text-muted-foreground">{amenity}</Text>
                     </View>
                   ))}
                   {property.amenities.length > 3 && (
-                    <Text className="text-xs font-body text-muted-foreground self-center">
+                    <Text className="self-center font-body text-xs text-muted-foreground">
                       +{property.amenities.length - 3} more
                     </Text>
                   )}

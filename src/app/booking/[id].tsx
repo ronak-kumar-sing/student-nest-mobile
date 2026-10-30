@@ -9,6 +9,7 @@ import { PriceTag } from '@/components/common/price-tag';
 import { formatIST } from '@/lib/dates';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/toast';
+import { colors } from '@/theme/tokens';
 
 export default function BookingDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -21,14 +22,14 @@ export default function BookingDetailScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>
-      <View className="px-4 py-3 bg-card border-b border-border flex-row items-center justify-between">
+      <View className="flex-row items-center justify-between border-b border-border bg-card px-4 py-3">
         <TouchableOpacity
           onPress={() => router.back()}
           className="h-9 w-9 items-center justify-center rounded-full bg-muted"
         >
           <ArrowLeft size={18} className="text-foreground" />
         </TouchableOpacity>
-        <Text className="text-body font-heading text-foreground">Booking Details</Text>
+        <Text className="font-heading text-body text-foreground">Booking Details</Text>
         <View className="w-9" />
       </View>
 
@@ -36,73 +37,70 @@ export default function BookingDetailScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
       >
-        <View className="flex-row items-center justify-between mb-4">
+        <View className="mb-4 flex-row items-center justify-between">
           <StatusPill status={booking.status} />
-          <Text className="text-xs font-body text-muted-foreground">
+          <Text className="font-body text-xs text-muted-foreground">
             Created on {formatIST(booking.createdAt, 'dd MMM yyyy')}
           </Text>
         </View>
 
         {/* Property Summary */}
-        <View className="bg-card border border-border p-4 rounded-xl mb-5 shadow-elevation-1">
-          <Text className="text-body font-heading text-foreground mb-1">
-            {property?.title}
-          </Text>
+        <View className="shadow-elevation-1 mb-5 rounded-xl border border-border bg-card p-4">
+          <Text className="mb-1 font-heading text-body text-foreground">{property?.title}</Text>
           <PriceTag paise={booking.agreedRentPaise} size="default" />
         </View>
 
         {/* Contact and Address Reveal Rules (Backend Spec §7 & §07) */}
         {isApproved ? (
-          <View className="bg-success/10 border border-success/30 p-4 rounded-xl mb-5">
-            <View className="flex-row items-center mb-2">
-              <ShieldCheck size={18} color="hsl(var(--success))" className="mr-2" />
-              <Text className="text-sm font-body-semibold text-success">
+          <View className="mb-5 rounded-xl border border-success/30 bg-success/10 p-4">
+            <View className="mb-2 flex-row items-center">
+              <ShieldCheck size={18} color={colors.success} className="mr-2" />
+              <Text className="font-body-semibold text-sm text-success">
                 Contact & Exact Address Revealed
               </Text>
             </View>
-            <View className="gap-2 mt-2">
+            <View className="mt-2 gap-2">
               <View className="flex-row items-center">
-                <MapPin size={14} className="text-foreground mr-2" />
-                <Text className="text-xs font-body text-foreground">
+                <MapPin size={14} className="mr-2 text-foreground" />
+                <Text className="font-body text-xs text-foreground">
                   {property?.address ?? 'House #100, Vijay Nagar, Indore'}
                 </Text>
               </View>
               <View className="flex-row items-center">
-                <Phone size={14} className="text-foreground mr-2" />
-                <Text className="text-xs font-body text-foreground">
+                <Phone size={14} className="mr-2 text-foreground" />
+                <Text className="font-body text-xs text-foreground">
                   Owner Phone: {owner?.phone ?? '+91 98765 43212'}
                 </Text>
               </View>
             </View>
           </View>
         ) : (
-          <View className="bg-muted/60 border border-border p-4 rounded-xl mb-5">
-            <Text className="text-xs font-body text-muted-foreground">
-              🔒 The owner&apos;s direct contact phone number and exact street address will be unlocked once this booking application is approved.
+          <View className="mb-5 rounded-xl border border-border bg-muted/60 p-4">
+            <Text className="font-body text-xs text-muted-foreground">
+              🔒 The owner&apos;s direct contact phone number and exact street address will be
+              unlocked once this booking application is approved.
             </Text>
           </View>
         )}
 
         {/* Status History Timeline */}
         <View className="mb-6">
-          <Text className="text-body font-heading text-foreground mb-3">
-            Application Timeline
-          </Text>
-          <View className="bg-card border border-border p-4 rounded-xl gap-4 shadow-elevation-1">
+          <Text className="mb-3 font-heading text-body text-foreground">Application Timeline</Text>
+          <View className="shadow-elevation-1 gap-4 rounded-xl border border-border bg-card p-4">
             {booking.history.map((entry, index) => (
               <View key={index} className="flex-row items-start">
-                <View className="h-6 w-6 rounded-full bg-primary/10 items-center justify-center mr-3 mt-0.5">
-                  <CheckCircle2 size={14} color="hsl(var(--primary))" />
+                <View className="mr-3 mt-0.5 h-6 w-6 items-center justify-center rounded-full bg-primary/10">
+                  <CheckCircle2 size={14} color={colors.primary} />
                 </View>
                 <View className="flex-1">
-                  <Text className="text-xs font-body-semibold text-foreground capitalize">
+                  <Text className="font-body-semibold text-xs capitalize text-foreground">
                     {entry.status.replace('_', ' ')}
                   </Text>
-                  <Text className="text-[11px] font-body text-muted-foreground">
+                  <Text className="font-body text-[11px] text-muted-foreground">
                     {formatIST(entry.at, 'dd MMM yyyy, hh:mm a')}
                   </Text>
                   {entry.note && (
-                    <Text className="text-xs font-body text-foreground mt-1 bg-muted/60 p-2 rounded">
+                    <Text className="mt-1 rounded bg-muted/60 p-2 font-body text-xs text-foreground">
                       &ldquo;{entry.note}&rdquo;
                     </Text>
                   )}

@@ -20,21 +20,21 @@ export default function InboxScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>
-      <View className="px-4 py-3 bg-card border-b border-border">
-        <Text className="text-h2 font-heading text-foreground">{t('tabs.inbox')}</Text>
+      <View className="border-b border-border bg-card px-4 py-3">
+        <Text className="font-heading text-h2 text-foreground">{t('tabs.inbox')}</Text>
 
         {/* Segmented Control */}
-        <View className="flex-row bg-muted p-1 rounded-xl mt-3">
+        <View className="mt-3 flex-row rounded-xl bg-muted p-1">
           <TouchableOpacity
             onPress={() => setActiveTab('messages')}
             className={cn(
-              'flex-1 py-2 rounded-lg items-center',
-              activeTab === 'messages' ? 'bg-card shadow-elevation-1' : '',
+              'flex-1 items-center rounded-lg py-2',
+              activeTab === 'messages' ? 'shadow-elevation-1 bg-card' : 'bg-transparent',
             )}
           >
             <Text
               className={cn(
-                'text-xs font-body-semibold',
+                'font-body-semibold text-xs',
                 activeTab === 'messages' ? 'text-foreground' : 'text-muted-foreground',
               )}
             >
@@ -45,20 +45,20 @@ export default function InboxScreen() {
           <TouchableOpacity
             onPress={() => setActiveTab('notifications')}
             className={cn(
-              'flex-1 py-2 rounded-lg items-center flex-row justify-center',
-              activeTab === 'notifications' ? 'bg-card shadow-elevation-1' : '',
+              'flex-1 flex-row items-center justify-center rounded-lg py-2',
+              activeTab === 'notifications' ? 'shadow-elevation-1 bg-card' : 'bg-transparent',
             )}
           >
             <Text
               className={cn(
-                'text-xs font-body-semibold mr-1.5',
+                'mr-1.5 font-body-semibold text-xs',
                 activeTab === 'notifications' ? 'text-foreground' : 'text-muted-foreground',
               )}
             >
               Notifications
             </Text>
             {unreadNotifs > 0 && (
-              <View className="bg-destructive px-1.5 py-0.2 rounded-full">
+              <View className="py-0.2 rounded-full bg-destructive px-1.5">
                 <Text className="text-[10px] font-bold text-destructive-foreground">
                   {unreadNotifs}
                 </Text>
@@ -91,27 +91,24 @@ export default function InboxScreen() {
                   <TouchableOpacity
                     key={inquiry.id}
                     onPress={() => router.push(`/chat/${inquiry.id}`)}
-                    className="bg-card rounded-xl border border-border p-4 flex-row items-center justify-between shadow-elevation-1"
+                    className="shadow-elevation-1 flex-row items-center justify-between rounded-xl border border-border bg-card p-4"
                     activeOpacity={0.8}
                   >
                     <View className="flex-1 pr-3">
-                      <View className="flex-row items-center justify-between mb-1">
-                        <Text className="text-body font-body-semibold text-foreground">
+                      <View className="mb-1 flex-row items-center justify-between">
+                        <Text className="font-body-semibold text-body text-foreground">
                           {owner?.displayName ?? 'Verified Owner'}
                         </Text>
-                        <Text className="text-[11px] font-body text-muted-foreground">
+                        <Text className="font-body text-[11px] text-muted-foreground">
                           {formatRelativeIST(inquiry.updatedAt)}
                         </Text>
                       </View>
 
-                      <Text className="text-xs font-body-medium text-primary mb-1">
+                      <Text className="mb-1 font-body-medium text-xs text-primary">
                         {property?.title ?? 'Room listing'}
                       </Text>
 
-                      <Text
-                        className="text-xs font-body text-muted-foreground"
-                        numberOfLines={1}
-                      >
+                      <Text className="font-body text-xs text-muted-foreground" numberOfLines={1}>
                         {inquiry.lastMessage}
                       </Text>
                     </View>
@@ -135,18 +132,18 @@ export default function InboxScreen() {
                 key={notif.id}
                 className={cn(
                   'rounded-xl border p-4',
-                  notif.read ? 'bg-card border-border' : 'bg-primary/5 border-primary/20',
+                  notif.read ? 'border-border bg-card' : 'border-primary/20 bg-primary/5',
                 )}
               >
-                <View className="flex-row items-center justify-between mb-1">
-                  <Text className="text-body font-body-semibold text-foreground">
+                <View className="mb-1 flex-row items-center justify-between">
+                  <Text className="font-body-semibold text-body text-foreground">
                     {notif.title}
                   </Text>
-                  <Text className="text-[11px] font-body text-muted-foreground">
+                  <Text className="font-body text-[11px] text-muted-foreground">
                     {formatRelativeIST(notif.createdAt)}
                   </Text>
                 </View>
-                <Text className="text-xs font-body text-muted-foreground leading-5">
+                <Text className="font-body text-xs leading-5 text-muted-foreground">
                   {notif.body}
                 </Text>
               </View>

@@ -48,22 +48,25 @@ export default function ProfileSetupScreen() {
     <SafeAreaView className="flex-1 bg-background p-6">
       <TouchableOpacity
         onPress={() => router.back()}
-        className="h-10 w-10 items-center justify-center rounded-full bg-muted mb-6"
+        className="mb-6 h-10 w-10 items-center justify-center rounded-full bg-muted"
       >
         <ArrowLeft size={20} className="text-foreground" />
       </TouchableOpacity>
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 24 }}
+      >
         <View className="mb-6">
-          <Text className="text-h1 font-heading text-foreground mb-2">
+          <Text className="mb-2 font-heading text-h1 text-foreground">
             {t('auth.profileTitle')}
           </Text>
-          <Text className="text-body font-body text-muted-foreground">
+          <Text className="font-body text-body text-muted-foreground">
             Tell us a bit about yourself to personalize your experience.
           </Text>
         </View>
 
-        <View className="gap-4 mb-6">
+        <View className="mb-6 gap-4">
           <Input
             label={t('auth.nameLabel')}
             placeholder="e.g. Rahul Sharma"
@@ -73,7 +76,7 @@ export default function ProfileSetupScreen() {
           />
 
           <View>
-            <Text className="text-sm font-body-medium text-foreground mb-1.5">
+            <Text className="mb-1.5 font-body-medium text-sm text-foreground">
               {t('auth.genderLabel')}
             </Text>
             <View className="flex-row gap-2">
@@ -81,15 +84,13 @@ export default function ProfileSetupScreen() {
                 <TouchableOpacity
                   key={g}
                   onPress={() => setGender(g)}
-                  className={`flex-1 py-2.5 rounded-lg border items-center capitalize ${
-                    gender === g
-                      ? 'border-primary bg-primary/10'
-                      : 'border-border bg-card'
+                  className={`flex-1 items-center rounded-lg border py-2.5 capitalize ${
+                    gender === g ? 'border-primary bg-primary/10' : 'border-border bg-card'
                   }`}
                 >
                   <Text
-                    className={`text-sm font-body-medium ${
-                      gender === g ? 'text-primary font-semibold' : 'text-foreground'
+                    className={`font-body-medium text-sm ${
+                      gender === g ? 'font-semibold text-primary' : 'text-foreground'
                     }`}
                   >
                     {g}
@@ -116,8 +117,8 @@ export default function ProfileSetupScreen() {
           />
         </View>
 
-        <Button onPress={handleFinish} size="lg" className="w-full mt-4">
-          <Text className="text-primary-foreground font-body-semibold text-body">
+        <Button onPress={handleFinish} size="lg" className="mt-4 w-full">
+          <Text className="font-body-semibold text-body text-primary-foreground">
             Complete Setup
           </Text>
         </Button>
@@ -125,4 +126,3 @@ export default function ProfileSetupScreen() {
     </SafeAreaView>
   );
 }
-

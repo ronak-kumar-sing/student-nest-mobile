@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useSessionStore } from '@/stores/session';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/cn';
+import { colors } from '@/theme/tokens';
 
 export default function RoleScreen() {
   const { t } = useTranslation();
@@ -19,20 +20,18 @@ export default function RoleScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background p-6 justify-between">
+    <SafeAreaView className="flex-1 justify-between bg-background p-6">
       <View>
         <TouchableOpacity
           onPress={() => router.back()}
-          className="h-10 w-10 items-center justify-center rounded-full bg-muted mb-6"
+          className="mb-6 h-10 w-10 items-center justify-center rounded-full bg-muted"
         >
           <ArrowLeft size={20} className="text-foreground" />
         </TouchableOpacity>
 
         <View className="mb-8">
-          <Text className="text-h1 font-heading text-foreground mb-2">
-            {t('auth.roleTitle')}
-          </Text>
-          <Text className="text-body font-body text-muted-foreground">
+          <Text className="mb-2 font-heading text-h1 text-foreground">{t('auth.roleTitle')}</Text>
+          <Text className="font-body text-body text-muted-foreground">
             Select how you want to use Student Nest. You can also become an owner later.
           </Text>
         </View>
@@ -42,36 +41,34 @@ export default function RoleScreen() {
           <TouchableOpacity
             onPress={() => setSelectedRole('student')}
             className={cn(
-              'p-5 rounded-xl border-2 flex-row items-center justify-between',
-              selectedRole === 'student'
-                ? 'border-primary bg-primary/5'
-                : 'border-border bg-card',
+              'flex-row items-center justify-between rounded-xl border-2 p-5',
+              selectedRole === 'student' ? 'border-primary bg-primary/5' : 'border-border bg-card',
             )}
           >
-            <View className="flex-row items-center flex-1 pr-4">
+            <View className="flex-1 flex-row items-center pr-4">
               <View
                 className={cn(
-                  'h-12 w-12 rounded-xl items-center justify-center mr-4',
+                  'mr-4 h-12 w-12 items-center justify-center rounded-xl',
                   selectedRole === 'student' ? 'bg-primary' : 'bg-muted',
                 )}
               >
                 <GraduationCap
                   size={24}
-                  color={selectedRole === 'student' ? 'white' : 'hsl(var(--muted-foreground))'}
+                  color={selectedRole === 'student' ? 'white' : colors.mutedForeground}
                 />
               </View>
               <View className="flex-1">
-                <Text className="text-body-semibold font-heading text-foreground mb-1">
+                <Text className="text-body-semibold mb-1 font-heading text-foreground">
                   {t('auth.student')}
                 </Text>
-                <Text className="text-xs font-body text-muted-foreground">
+                <Text className="font-body text-xs text-muted-foreground">
                   Find verified rooms, book tours, and match with compatible roommates.
                 </Text>
               </View>
             </View>
             <View
               className={cn(
-                'h-6 w-6 rounded-full border items-center justify-center',
+                'h-6 w-6 items-center justify-center rounded-full border',
                 selectedRole === 'student'
                   ? 'border-primary bg-primary'
                   : 'border-muted-foreground/30',
@@ -85,36 +82,34 @@ export default function RoleScreen() {
           <TouchableOpacity
             onPress={() => setSelectedRole('owner')}
             className={cn(
-              'p-5 rounded-xl border-2 flex-row items-center justify-between',
-              selectedRole === 'owner'
-                ? 'border-primary bg-primary/5'
-                : 'border-border bg-card',
+              'flex-row items-center justify-between rounded-xl border-2 p-5',
+              selectedRole === 'owner' ? 'border-primary bg-primary/5' : 'border-border bg-card',
             )}
           >
-            <View className="flex-row items-center flex-1 pr-4">
+            <View className="flex-1 flex-row items-center pr-4">
               <View
                 className={cn(
-                  'h-12 w-12 rounded-xl items-center justify-center mr-4',
+                  'mr-4 h-12 w-12 items-center justify-center rounded-xl',
                   selectedRole === 'owner' ? 'bg-primary' : 'bg-muted',
                 )}
               >
                 <Building2
                   size={24}
-                  color={selectedRole === 'owner' ? 'white' : 'hsl(var(--muted-foreground))'}
+                  color={selectedRole === 'owner' ? 'white' : colors.mutedForeground}
                 />
               </View>
               <View className="flex-1">
-                <Text className="text-body-semibold font-heading text-foreground mb-1">
+                <Text className="text-body-semibold mb-1 font-heading text-foreground">
                   {t('auth.owner')}
                 </Text>
-                <Text className="text-xs font-body text-muted-foreground">
+                <Text className="font-body text-xs text-muted-foreground">
                   List your property, manage bookings, and receive rent inquiries with 0% brokerage.
                 </Text>
               </View>
             </View>
             <View
               className={cn(
-                'h-6 w-6 rounded-full border items-center justify-center',
+                'h-6 w-6 items-center justify-center rounded-full border',
                 selectedRole === 'owner'
                   ? 'border-primary bg-primary'
                   : 'border-muted-foreground/30',
@@ -127,11 +122,10 @@ export default function RoleScreen() {
       </View>
 
       <Button onPress={handleContinue} size="lg" className="w-full">
-        <Text className="text-primary-foreground font-body-semibold text-body">
+        <Text className="font-body-semibold text-body text-primary-foreground">
           {t('common.continue')}
         </Text>
       </Button>
     </SafeAreaView>
   );
 }
-

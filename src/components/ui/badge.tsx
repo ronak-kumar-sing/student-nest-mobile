@@ -5,25 +5,22 @@ import { cn } from '@/lib/cn';
 
 /* ─────────────────────────── variants ─────────────────────────── */
 
-const badgeVariants = cva(
-  'items-center justify-center self-start rounded-full px-2.5 py-0.5',
-  {
-    variants: {
-      variant: {
-        default: 'bg-primary',
-        secondary: 'bg-secondary',
-        destructive: 'bg-destructive',
-        outline: 'border border-border bg-transparent',
-        success: 'bg-success',
-        warning: 'bg-warning',
-        info: 'bg-info',
-      },
-    },
-    defaultVariants: {
-      variant: 'default',
+const badgeVariants = cva('items-center justify-center self-start rounded-full px-2.5 py-0.5', {
+  variants: {
+    variant: {
+      default: 'bg-primary',
+      secondary: 'bg-secondary',
+      destructive: 'bg-destructive',
+      outline: 'border border-border bg-transparent',
+      success: 'bg-success',
+      warning: 'bg-warning',
+      info: 'bg-info',
     },
   },
-);
+  defaultVariants: {
+    variant: 'default',
+  },
+});
 
 const badgeTextVariants = cva('font-body-semibold text-xs', {
   variants: {

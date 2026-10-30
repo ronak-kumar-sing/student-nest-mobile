@@ -11,4 +11,3 @@ export async function simulateLatency(): Promise<void> {
   const total = baseLatency + jitter;
   await new Promise((resolve) => setTimeout(resolve, total));
 }
-

@@ -8,18 +8,18 @@ export default function NotFoundScreen() {
   return (
     <>
       <Stack.Screen options={{ title: 'Oops!', headerShown: true }} />
-      <View className="flex-1 items-center justify-center p-6 bg-background">
-        <Text className="text-display font-heading text-primary mb-2">404</Text>
-        <Text className="text-h3 font-heading text-foreground mb-2">
+      <View className="flex-1 items-center justify-center bg-background p-6">
+        <Text className="mb-2 font-heading text-display text-primary">404</Text>
+        <Text className="mb-2 font-heading text-h3 text-foreground">
           This screen doesn&apos;t exist.
         </Text>
-        <Text className="font-body text-sm text-muted-foreground text-center mb-6">
+        <Text className="mb-6 text-center font-body text-sm text-muted-foreground">
           The link you followed may be broken, or the page may have been removed.
         </Text>
         <Link href="/" asChild>
           <Button variant="default" size="default">
             <Home size={18} color="white" className="mr-2" />
-            <Text className="text-primary-foreground font-body-semibold">Go to Home</Text>
+            <Text className="font-body-semibold text-primary-foreground">Go to Home</Text>
           </Button>
         </Link>
       </View>

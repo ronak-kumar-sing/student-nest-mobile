@@ -2,19 +2,13 @@ import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import {
-  X,
-  RotateCcw,
-  Wifi,
-  WifiOff,
-  Sliders,
-  CheckCircle2,
-} from 'lucide-react-native';
+import { X, RotateCcw, Wifi, WifiOff, Sliders, CheckCircle2 } from 'lucide-react-native';
 import { useDevSettingsStore } from '@/stores/dev-settings';
 import { useSessionStore } from '@/stores/session';
 import { resetDB } from '@/api/mock/db';
 import { toast } from '@/components/ui/toast';
 import { cn } from '@/lib/cn';
+import { colors } from '@/theme/tokens';
 
 const FEATURES = [
   'auth',
@@ -56,10 +50,10 @@ export default function DevMenuScreen() {
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>
       {/* Header */}
-      <View className="px-4 py-3 bg-card border-b border-border flex-row items-center justify-between">
+      <View className="flex-row items-center justify-between border-b border-border bg-card px-4 py-3">
         <View>
-          <Text className="text-h2 font-heading text-foreground">Developer Menu</Text>
-          <Text className="text-xs font-body text-muted-foreground">
+          <Text className="font-heading text-h2 text-foreground">Developer Menu</Text>
+          <Text className="font-body text-xs text-muted-foreground">
             Runtime overrides, mock controls & error injection
           </Text>
         </View>
@@ -77,7 +71,7 @@ export default function DevMenuScreen() {
       >
         {/* Switch Persona Role */}
         <View className="mb-6">
-          <Text className="text-sm font-body-semibold text-foreground mb-2">
+          <Text className="mb-2 font-body-semibold text-sm text-foreground">
             Switch Persona Role
           </Text>
           <View className="flex-row gap-2">
@@ -89,15 +83,13 @@ export default function DevMenuScreen() {
                   toast.success(`Switched active role to: ${r}`);
                 }}
                 className={cn(
-                  'flex-1 py-2.5 rounded-lg border items-center capitalize',
-                  role === r
-                    ? 'border-primary bg-primary/10'
-                    : 'border-border bg-card',
+                  'flex-1 items-center rounded-lg border py-2.5 capitalize',
+                  role === r ? 'border-primary bg-primary/10' : 'border-border bg-card',
                 )}
               >
                 <Text
                   className={cn(
-                    'text-xs font-body-semibold',
+                    'font-body-semibold text-xs',
                     role === r ? 'text-primary' : 'text-foreground',
                   )}
                 >
@@ -110,25 +102,23 @@ export default function DevMenuScreen() {
 
         {/* Network & Latency Controls */}
         <View className="mb-6">
-          <Text className="text-sm font-body-semibold text-foreground mb-2">
+          <Text className="mb-2 font-body-semibold text-sm text-foreground">
             Simulated Network Latency
           </Text>
-          <View className="flex-row gap-2 mb-3">
+          <View className="mb-3 flex-row gap-2">
             {[100, 300, 600, 1200].map((ms) => (
               <TouchableOpacity
                 key={ms}
                 onPress={() => setMockLatency(ms)}
                 className={cn(
-                  'flex-1 py-2 rounded-lg border items-center',
-                  mockLatency === ms
-                    ? 'border-primary bg-primary/10'
-                    : 'border-border bg-card',
+                  'flex-1 items-center rounded-lg border py-2',
+                  mockLatency === ms ? 'border-primary bg-primary/10' : 'border-border bg-card',
                 )}
               >
                 <Text
                   className={cn(
-                    'text-xs font-body-medium',
-                    mockLatency === ms ? 'text-primary font-bold' : 'text-foreground',
+                    'font-body-medium text-xs',
+                    mockLatency === ms ? 'font-bold text-primary' : 'text-foreground',
                   )}
                 >
                   {ms}ms
@@ -144,26 +134,26 @@ export default function DevMenuScreen() {
               toast.info(!isOffline ? 'Simulating offline state' : 'Restored network');
             }}
             className={cn(
-              'p-3 rounded-xl border flex-row items-center justify-between',
+              'flex-row items-center justify-between rounded-xl border p-3',
               isOffline ? 'border-destructive bg-destructive/10' : 'border-border bg-card',
             )}
           >
             <View className="flex-row items-center">
               {isOffline ? (
-                <WifiOff size={18} className="text-destructive mr-2.5" />
+                <WifiOff size={18} className="mr-2.5 text-destructive" />
               ) : (
-                <Wifi size={18} className="text-foreground mr-2.5" />
+                <Wifi size={18} className="mr-2.5 text-foreground" />
               )}
               <Text
                 className={cn(
-                  'text-xs font-body-semibold',
+                  'font-body-semibold text-xs',
                   isOffline ? 'text-destructive' : 'text-foreground',
                 )}
               >
                 Force Offline Mode ({isOffline ? 'ON' : 'OFF'})
               </Text>
             </View>
-            <Text className="text-[11px] font-body text-muted-foreground">
+            <Text className="font-body text-[11px] text-muted-foreground">
               {isOffline ? 'Simulating no connection' : 'Connected'}
             </Text>
           </TouchableOpacity>
@@ -171,7 +161,7 @@ export default function DevMenuScreen() {
 
         {/* Error Injection */}
         <View className="mb-6">
-          <Text className="text-sm font-body-semibold text-foreground mb-2">
+          <Text className="mb-2 font-body-semibold text-sm text-foreground">
             Error Injection Testing
           </Text>
           <View className="gap-2">
@@ -188,21 +178,19 @@ export default function DevMenuScreen() {
                   toast.info(code ? `Injected error: ${code}` : 'Cleared error injection');
                 }}
                 className={cn(
-                  'p-2.5 rounded-lg border flex-row items-center justify-between',
-                  forceError === code
-                    ? 'border-warning bg-warning/10'
-                    : 'border-border bg-card',
+                  'flex-row items-center justify-between rounded-lg border p-2.5',
+                  forceError === code ? 'border-warning bg-warning/10' : 'border-border bg-card',
                 )}
               >
                 <Text
                   className={cn(
-                    'text-xs font-body',
-                    forceError === code ? 'text-warning font-semibold' : 'text-foreground',
+                    'font-body text-xs',
+                    forceError === code ? 'font-semibold text-warning' : 'text-foreground',
                   )}
                 >
                   {label}
                 </Text>
-                {forceError === code && <CheckCircle2 size={14} color="hsl(var(--warning))" />}
+                {forceError === code && <CheckCircle2 size={14} color={colors.warning} />}
               </TouchableOpacity>
             ))}
           </View>
@@ -210,36 +198,36 @@ export default function DevMenuScreen() {
 
         {/* Per-Feature API Mode Override (§6) */}
         <View className="mb-6">
-          <Text className="text-sm font-body-semibold text-foreground mb-2">
+          <Text className="mb-2 font-body-semibold text-sm text-foreground">
             Per-Feature Transport Modes (Mock ↔ HTTP)
           </Text>
-          <Text className="text-xs font-body text-muted-foreground mb-3">
-            Global mode defaults to EXPO_PUBLIC_API_MODE (mock). Toggle individual features to test against the NestJS backend as phases ship.
+          <Text className="mb-3 font-body text-xs text-muted-foreground">
+            Global mode defaults to EXPO_PUBLIC_API_MODE (mock). Toggle individual features to test
+            against the NestJS backend as phases ship.
           </Text>
 
-          <View className="bg-card border border-border rounded-xl divide-y divide-border">
+          <View className="divide-y divide-border rounded-xl border border-border bg-card">
             {FEATURES.map((feature) => {
               const currentMode = apiModeOverrides[feature] ?? 'mock';
               return (
-                <View
-                  key={feature}
-                  className="p-3 flex-row items-center justify-between"
-                >
-                  <Text className="text-xs font-body-medium text-foreground capitalize">
+                <View key={feature} className="flex-row items-center justify-between p-3">
+                  <Text className="font-body-medium text-xs capitalize text-foreground">
                     {feature}
                   </Text>
-                  <View className="flex-row bg-muted rounded-md p-0.5">
+                  <View className="flex-row rounded-md bg-muted p-0.5">
                     <TouchableOpacity
                       onPress={() => setApiMode(feature, 'mock')}
                       className={cn(
-                        'px-2.5 py-1 rounded text-center',
+                        'rounded px-2.5 py-1 text-center',
                         currentMode === 'mock' ? 'bg-primary' : '',
                       )}
                     >
                       <Text
                         className={cn(
                           'text-[10px] font-bold uppercase',
-                          currentMode === 'mock' ? 'text-primary-foreground' : 'text-muted-foreground',
+                          currentMode === 'mock'
+                            ? 'text-primary-foreground'
+                            : 'text-muted-foreground',
                         )}
                       >
                         Mock
@@ -249,14 +237,16 @@ export default function DevMenuScreen() {
                     <TouchableOpacity
                       onPress={() => setApiMode(feature, 'http')}
                       className={cn(
-                        'px-2.5 py-1 rounded text-center',
+                        'rounded px-2.5 py-1 text-center',
                         currentMode === 'http' ? 'bg-primary' : '',
                       )}
                     >
                       <Text
                         className={cn(
                           'text-[10px] font-bold uppercase',
-                          currentMode === 'http' ? 'text-primary-foreground' : 'text-muted-foreground',
+                          currentMode === 'http'
+                            ? 'text-primary-foreground'
+                            : 'text-muted-foreground',
                         )}
                       >
                         HTTP
@@ -273,10 +263,10 @@ export default function DevMenuScreen() {
         <View className="gap-3">
           <TouchableOpacity
             onPress={handleResetData}
-            className="bg-card border border-border p-3.5 rounded-xl flex-row items-center justify-center shadow-elevation-1"
+            className="shadow-elevation-1 flex-row items-center justify-center rounded-xl border border-border bg-card p-3.5"
           >
-            <RotateCcw size={16} className="text-primary mr-2" />
-            <Text className="text-xs font-body-semibold text-primary">
+            <RotateCcw size={16} className="mr-2 text-primary" />
+            <Text className="font-body-semibold text-xs text-primary">
               Reset Mock DB to Default Seed
             </Text>
           </TouchableOpacity>
@@ -286,10 +276,10 @@ export default function DevMenuScreen() {
               resetAll();
               toast.success('Dev settings reset to default');
             }}
-            className="bg-card border border-border p-3.5 rounded-xl flex-row items-center justify-center shadow-elevation-1"
+            className="shadow-elevation-1 flex-row items-center justify-center rounded-xl border border-border bg-card p-3.5"
           >
-            <Sliders size={16} className="text-muted-foreground mr-2" />
-            <Text className="text-xs font-body-semibold text-muted-foreground">
+            <Sliders size={16} className="mr-2 text-muted-foreground" />
+            <Text className="font-body-semibold text-xs text-muted-foreground">
               Reset All Dev Settings
             </Text>
           </TouchableOpacity>

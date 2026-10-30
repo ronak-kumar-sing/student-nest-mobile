@@ -12,104 +12,104 @@
 // ─── Colors (Light theme) ───────────────────────────────────────────
 
 export const colors = {
-  primary: 'hsl(175, 84%, 32%)',
-  primaryForeground: 'hsl(0, 0%, 100%)',
+  primary: '#0F766E', // deep teal
+  primaryForeground: '#FFFFFF',
 
-  secondary: 'hsl(210, 40%, 96%)',
-  secondaryForeground: 'hsl(222, 47%, 11%)',
+  secondary: '#F1F5F9', // slate-100
+  secondaryForeground: '#0F172A', // slate-900
 
-  background: 'hsl(0, 0%, 100%)',
-  foreground: 'hsl(222, 47%, 11%)',
+  background: '#FFFFFF',
+  foreground: '#0F172A',
 
-  card: 'hsl(0, 0%, 100%)',
-  cardForeground: 'hsl(222, 47%, 11%)',
+  card: '#FFFFFF',
+  cardForeground: '#0F172A',
 
-  popover: 'hsl(0, 0%, 100%)',
-  popoverForeground: 'hsl(222, 47%, 11%)',
+  popover: '#FFFFFF',
+  popoverForeground: '#0F172A',
 
-  muted: 'hsl(210, 40%, 96%)',
-  mutedForeground: 'hsl(215, 16%, 47%)',
+  muted: '#F1F5F9',
+  mutedForeground: '#64748B', // slate-500
 
-  accent: 'hsl(210, 40%, 96%)',
-  accentForeground: 'hsl(222, 47%, 11%)',
+  accent: '#F1F5F9',
+  accentForeground: '#0F172A',
 
-  destructive: 'hsl(0, 84%, 60%)',
-  destructiveForeground: 'hsl(0, 0%, 100%)',
+  destructive: '#EF4444', // red-500
+  destructiveForeground: '#FFFFFF',
 
-  success: 'hsl(142, 71%, 45%)',
-  successForeground: 'hsl(0, 0%, 100%)',
+  success: '#16A34A', // green-600
+  successForeground: '#FFFFFF',
 
-  warning: 'hsl(38, 92%, 50%)',
-  warningForeground: 'hsl(0, 0%, 100%)',
+  warning: '#F59E0B', // amber-500
+  warningForeground: '#FFFFFF',
 
-  info: 'hsl(199, 89%, 48%)',
-  infoForeground: 'hsl(0, 0%, 100%)',
+  info: '#0284C7', // sky-600
+  infoForeground: '#FFFFFF',
 
-  border: 'hsl(214, 32%, 91%)',
-  input: 'hsl(214, 32%, 91%)',
-  ring: 'hsl(175, 84%, 32%)',
+  border: '#E2E8F0', // slate-200
+  input: '#E2E8F0',
+  ring: '#0F766E',
 
   status: {
-    pending: 'hsl(38, 92%, 50%)',
-    approved: 'hsl(142, 71%, 45%)',
-    rejected: 'hsl(0, 84%, 60%)',
-    published: 'hsl(142, 71%, 45%)',
-    draft: 'hsl(215, 16%, 47%)',
-    submitted: 'hsl(199, 89%, 48%)',
-    confirmed: 'hsl(142, 71%, 45%)',
-    cancelled: 'hsl(0, 84%, 60%)',
+    pending: '#F59E0B',
+    approved: '#16A34A',
+    rejected: '#EF4444',
+    published: '#16A34A',
+    draft: '#64748B',
+    submitted: '#0284C7',
+    confirmed: '#16A34A',
+    cancelled: '#EF4444',
   },
 } as const;
 
 // ─── Dark Colors ────────────────────────────────────────────────────
 
 export const darkColors = {
-  primary: 'hsl(175, 84%, 40%)',
-  primaryForeground: 'hsl(0, 0%, 100%)',
+  primary: '#14B8A6', // teal-500
+  primaryForeground: '#FFFFFF',
 
-  secondary: 'hsl(217, 33%, 17%)',
-  secondaryForeground: 'hsl(210, 40%, 98%)',
+  secondary: '#1E293B', // slate-800
+  secondaryForeground: '#F8FAFC', // slate-50
 
-  background: 'hsl(222, 47%, 5%)',
-  foreground: 'hsl(210, 40%, 98%)',
+  background: '#0B0F17',
+  foreground: '#F8FAFC',
 
-  card: 'hsl(222, 47%, 8%)',
-  cardForeground: 'hsl(210, 40%, 98%)',
+  card: '#111827',
+  cardForeground: '#F8FAFC',
 
-  popover: 'hsl(222, 47%, 8%)',
-  popoverForeground: 'hsl(210, 40%, 98%)',
+  popover: '#111827',
+  popoverForeground: '#F8FAFC',
 
-  muted: 'hsl(217, 33%, 17%)',
-  mutedForeground: 'hsl(215, 20%, 65%)',
+  muted: '#1E293B',
+  mutedForeground: '#94A3B8', // slate-400
 
-  accent: 'hsl(217, 33%, 17%)',
-  accentForeground: 'hsl(210, 40%, 98%)',
+  accent: '#1E293B',
+  accentForeground: '#F8FAFC',
 
-  destructive: 'hsl(0, 63%, 50%)',
-  destructiveForeground: 'hsl(0, 0%, 100%)',
+  destructive: '#DC2626',
+  destructiveForeground: '#FFFFFF',
 
-  success: 'hsl(142, 71%, 40%)',
-  successForeground: 'hsl(0, 0%, 100%)',
+  success: '#15803D',
+  successForeground: '#FFFFFF',
 
-  warning: 'hsl(38, 92%, 45%)',
-  warningForeground: 'hsl(0, 0%, 100%)',
+  warning: '#D97706',
+  warningForeground: '#FFFFFF',
 
-  info: 'hsl(199, 89%, 42%)',
-  infoForeground: 'hsl(0, 0%, 100%)',
+  info: '#0369A1',
+  infoForeground: '#FFFFFF',
 
-  border: 'hsl(217, 33%, 20%)',
-  input: 'hsl(217, 33%, 20%)',
-  ring: 'hsl(175, 84%, 40%)',
+  border: '#1E293B',
+  input: '#1E293B',
+  ring: '#14B8A6',
 
   status: {
-    pending: 'hsl(38, 92%, 45%)',
-    approved: 'hsl(142, 71%, 40%)',
-    rejected: 'hsl(0, 63%, 50%)',
-    published: 'hsl(142, 71%, 40%)',
-    draft: 'hsl(215, 20%, 55%)',
-    submitted: 'hsl(199, 89%, 42%)',
-    confirmed: 'hsl(142, 71%, 40%)',
-    cancelled: 'hsl(0, 63%, 50%)',
+    pending: '#D97706',
+    approved: '#15803D',
+    rejected: '#DC2626',
+    published: '#15803D',
+    draft: '#94A3B8',
+    submitted: '#0369A1',
+    confirmed: '#15803D',
+    cancelled: '#DC2626',
   },
 } as const;
 

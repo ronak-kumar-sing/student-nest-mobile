@@ -1,11 +1,20 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ArrowLeft, Send, ShieldCheck, Lock } from 'lucide-react-native';
 import { getDB, addInquiryMessage } from '@/api/mock/db';
 import { formatIST } from '@/lib/dates';
 import { cn } from '@/lib/cn';
+import { colors } from '@/theme/tokens';
 
 export default function ChatScreen() {
   const { threadId } = useLocalSearchParams<{ threadId: string }>();
@@ -46,22 +55,22 @@ export default function ChatScreen() {
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>
       {/* Header */}
-      <View className="px-4 py-3 bg-card border-b border-border flex-row items-center justify-between">
-        <View className="flex-row items-center flex-1">
+      <View className="flex-row items-center justify-between border-b border-border bg-card px-4 py-3">
+        <View className="flex-1 flex-row items-center">
           <TouchableOpacity
             onPress={() => router.back()}
-            className="h-9 w-9 items-center justify-center rounded-full bg-muted mr-3"
+            className="mr-3 h-9 w-9 items-center justify-center rounded-full bg-muted"
           >
             <ArrowLeft size={18} className="text-foreground" />
           </TouchableOpacity>
           <View>
             <View className="flex-row items-center">
-              <Text className="text-body font-body-semibold text-foreground mr-1.5">
+              <Text className="mr-1.5 font-body-semibold text-body text-foreground">
                 {owner?.displayName ?? 'Verified Owner'}
               </Text>
-              <ShieldCheck size={14} color="hsl(var(--success))" />
+              <ShieldCheck size={14} color={colors.success} />
             </View>
-            <Text className="text-[11px] font-body text-muted-foreground">
+            <Text className="font-body text-[11px] text-muted-foreground">
               Direct chat • 0% Brokerage
             </Text>
           </View>
@@ -69,9 +78,9 @@ export default function ChatScreen() {
       </View>
 
       {/* Masked Contact Notice Banner */}
-      <View className="bg-muted/70 px-4 py-2 border-b border-border flex-row items-center justify-center">
-        <Lock size={12} className="text-muted-foreground mr-1.5" />
-        <Text className="text-[11px] font-body text-muted-foreground text-center">
+      <View className="flex-row items-center justify-center border-b border-border bg-muted/70 px-4 py-2">
+        <Lock size={12} className="mr-1.5 text-muted-foreground" />
+        <Text className="text-center font-body text-[11px] text-muted-foreground">
           Contact details are hidden in chat to protect your privacy until booking approval.
         </Text>
       </View>
@@ -96,8 +105,8 @@ export default function ChatScreen() {
                   className={cn(
                     'max-w-[80%] rounded-2xl p-3.5',
                     isMine
-                      ? 'self-end bg-primary rounded-tr-none'
-                      : 'self-start bg-card border border-border rounded-tl-none shadow-elevation-1',
+                      ? 'self-end rounded-tr-none bg-primary'
+                      : 'shadow-elevation-1 self-start rounded-tl-none border border-border bg-card',
                   )}
                 >
                   <Text
@@ -110,8 +119,8 @@ export default function ChatScreen() {
                   </Text>
                   <Text
                     className={cn(
-                      'text-[10px] font-body mt-1',
-                      isMine ? 'text-primary-foreground/75 text-right' : 'text-muted-foreground',
+                      'mt-1 font-body text-[10px]',
+                      isMine ? 'text-right text-primary-foreground/75' : 'text-muted-foreground',
                     )}
                   >
                     {formatIST(msg.createdAt, 'hh:mm a')}
@@ -123,26 +132,23 @@ export default function ChatScreen() {
         </ScrollView>
 
         {/* Input Bar */}
-        <View className="p-3 bg-card border-t border-border flex-row items-center gap-2">
+        <View className="flex-row items-center gap-2 border-t border-border bg-card p-3">
           <TextInput
             placeholder="Type a message..."
-            placeholderTextColor="hsl(var(--muted-foreground))"
+            placeholderTextColor={colors.mutedForeground}
             value={inputText}
             onChangeText={setInputText}
-            className="flex-1 bg-muted rounded-full px-4 py-2.5 font-body text-sm text-foreground"
+            className="flex-1 rounded-full bg-muted px-4 py-2.5 font-body text-sm text-foreground"
           />
           <TouchableOpacity
             onPress={handleSend}
             disabled={!inputText.trim()}
             className={cn(
-              'h-10 w-10 rounded-full items-center justify-center',
+              'h-10 w-10 items-center justify-center rounded-full',
               inputText.trim() ? 'bg-primary' : 'bg-muted',
             )}
           >
-            <Send
-              size={16}
-              color={inputText.trim() ? 'white' : 'hsl(var(--muted-foreground))'}
-            />
+            <Send size={16} color={inputText.trim() ? 'white' : colors.mutedForeground} />
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>

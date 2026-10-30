@@ -10,6 +10,7 @@ import { EmptyState } from '@/components/common/empty-state';
 import { formatIST } from '@/lib/dates';
 import { cn } from '@/lib/cn';
 import { useTranslation } from 'react-i18next';
+import { colors } from '@/theme/tokens';
 
 export default function ActivityScreen() {
   const { t } = useTranslation();
@@ -21,21 +22,21 @@ export default function ActivityScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>
-      <View className="px-4 py-3 bg-card border-b border-border">
-        <Text className="text-h2 font-heading text-foreground">{t('tabs.activity')}</Text>
+      <View className="border-b border-border bg-card px-4 py-3">
+        <Text className="font-heading text-h2 text-foreground">{t('tabs.activity')}</Text>
 
         {/* Segmented Control */}
-        <View className="flex-row bg-muted p-1 rounded-xl mt-3">
+        <View className="mt-3 flex-row rounded-xl bg-muted p-1">
           <TouchableOpacity
             onPress={() => setActiveTab('bookings')}
             className={cn(
-              'flex-1 py-2 rounded-lg items-center',
-              activeTab === 'bookings' ? 'bg-card shadow-elevation-1' : '',
+              'flex-1 items-center rounded-lg py-2',
+              activeTab === 'bookings' ? 'shadow-elevation-1 bg-card' : 'bg-transparent',
             )}
           >
             <Text
               className={cn(
-                'text-xs font-body-semibold',
+                'font-body-semibold text-xs',
                 activeTab === 'bookings' ? 'text-foreground' : 'text-muted-foreground',
               )}
             >
@@ -46,13 +47,13 @@ export default function ActivityScreen() {
           <TouchableOpacity
             onPress={() => setActiveTab('tours')}
             className={cn(
-              'flex-1 py-2 rounded-lg items-center',
-              activeTab === 'tours' ? 'bg-card shadow-elevation-1' : '',
+              'flex-1 items-center rounded-lg py-2',
+              activeTab === 'tours' ? 'shadow-elevation-1 bg-card' : 'bg-transparent',
             )}
           >
             <Text
               className={cn(
-                'text-xs font-body-semibold',
+                'font-body-semibold text-xs',
                 activeTab === 'tours' ? 'text-foreground' : 'text-muted-foreground',
               )}
             >
@@ -83,34 +84,34 @@ export default function ActivityScreen() {
                   <TouchableOpacity
                     key={booking.id}
                     onPress={() => router.push(`/booking/${booking.id}`)}
-                    className="bg-card rounded-xl border border-border p-4 shadow-elevation-1"
+                    className="shadow-elevation-1 rounded-xl border border-border bg-card p-4"
                     activeOpacity={0.8}
                   >
-                    <View className="flex-row items-center justify-between mb-2">
+                    <View className="mb-2 flex-row items-center justify-between">
                       <StatusPill status={booking.status} />
-                      <Text className="text-xs font-body text-muted-foreground">
+                      <Text className="font-body text-xs text-muted-foreground">
                         {formatIST(booking.createdAt, 'dd MMM yyyy')}
                       </Text>
                     </View>
 
-                    <Text className="text-body font-body-semibold text-foreground mb-1">
+                    <Text className="mb-1 font-body-semibold text-body text-foreground">
                       {property?.title ?? 'Student Room'}
                     </Text>
 
-                    <View className="flex-row items-center text-muted-foreground mb-3">
-                      <MapPin size={13} className="text-muted-foreground mr-1" />
-                      <Text className="text-xs font-body text-muted-foreground">
+                    <View className="mb-3 flex-row items-center text-muted-foreground">
+                      <MapPin size={13} className="mr-1 text-muted-foreground" />
+                      <Text className="font-body text-xs text-muted-foreground">
                         {property?.locality}, {property?.city}
                       </Text>
                     </View>
 
-                    <View className="flex-row items-center justify-between pt-3 border-t border-border/60">
+                    <View className="flex-row items-center justify-between border-t border-border/60 pt-3">
                       <PriceTag paise={booking.agreedRentPaise} size="sm" />
                       <View className="flex-row items-center">
-                        <Text className="text-xs font-body-medium text-primary mr-1">
+                        <Text className="mr-1 font-body-medium text-xs text-primary">
                           View Timeline
                         </Text>
-                        <ChevronRight size={14} color="hsl(var(--primary))" />
+                        <ChevronRight size={14} color={colors.primary} />
                       </View>
                     </View>
                   </TouchableOpacity>
@@ -134,31 +135,31 @@ export default function ActivityScreen() {
                 <TouchableOpacity
                   key={tour.id}
                   onPress={() => router.push(`/tour/${tour.id}`)}
-                  className="bg-card rounded-xl border border-border p-4 shadow-elevation-1"
+                  className="shadow-elevation-1 rounded-xl border border-border bg-card p-4"
                   activeOpacity={0.8}
                 >
-                  <View className="flex-row items-center justify-between mb-2">
+                  <View className="mb-2 flex-row items-center justify-between">
                     <StatusPill status={tour.status} />
-                    <Text className="text-xs font-body text-muted-foreground">
+                    <Text className="font-body text-xs text-muted-foreground">
                       {formatIST(tour.createdAt, 'dd MMM yyyy')}
                     </Text>
                   </View>
 
-                  <Text className="text-body font-body-semibold text-foreground mb-1">
+                  <Text className="mb-1 font-body-semibold text-body text-foreground">
                     {property?.title ?? 'Student Room Tour'}
                   </Text>
 
                   {tour.confirmedSlot && (
-                    <View className="flex-row items-center bg-muted/60 p-2 rounded-lg mt-2 mb-2">
-                      <Clock size={14} className="text-primary mr-2" />
-                      <Text className="text-xs font-body-medium text-foreground">
+                    <View className="mb-2 mt-2 flex-row items-center rounded-lg bg-muted/60 p-2">
+                      <Clock size={14} className="mr-2 text-primary" />
+                      <Text className="font-body-medium text-xs text-foreground">
                         Confirmed: {formatIST(tour.confirmedSlot, 'dd MMM yyyy, hh:mm a')}
                       </Text>
                     </View>
                   )}
 
                   <View className="flex-row items-center justify-between pt-2">
-                    <Text className="text-xs font-body text-muted-foreground">
+                    <Text className="font-body text-xs text-muted-foreground">
                       {tour.address ?? `${property?.locality}, ${property?.city}`}
                     </Text>
                     <ChevronRight size={14} className="text-muted-foreground" />
@@ -172,4 +173,3 @@ export default function ActivityScreen() {
     </SafeAreaView>
   );
 }
-

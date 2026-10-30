@@ -28,16 +28,14 @@ export default function EmailScreen() {
     <SafeAreaView className="flex-1 bg-background p-6">
       <TouchableOpacity
         onPress={() => router.back()}
-        className="h-10 w-10 items-center justify-center rounded-full bg-muted mb-6"
+        className="mb-6 h-10 w-10 items-center justify-center rounded-full bg-muted"
       >
         <ArrowLeft size={20} className="text-foreground" />
       </TouchableOpacity>
 
       <View className="mb-8">
-        <Text className="text-h1 font-heading text-foreground mb-2">
-          What&apos;s your email?
-        </Text>
-        <Text className="text-body font-body text-muted-foreground">
+        <Text className="mb-2 font-heading text-h1 text-foreground">What&apos;s your email?</Text>
+        <Text className="font-body text-body text-muted-foreground">
           We&apos;ll send a 6-digit verification code to confirm your email.
         </Text>
       </View>
@@ -58,13 +56,8 @@ export default function EmailScreen() {
         />
       </View>
 
-      <Button
-        onPress={handleContinue}
-        size="lg"
-        disabled={!email.trim()}
-        className="w-full mt-2"
-      >
-        <Text className="text-primary-foreground font-body-semibold text-body">
+      <Button onPress={handleContinue} size="lg" disabled={!email.trim()} className="mt-2 w-full">
+        <Text className="font-body-semibold text-body text-primary-foreground">
           {t('auth.continue')}
         </Text>
       </Button>

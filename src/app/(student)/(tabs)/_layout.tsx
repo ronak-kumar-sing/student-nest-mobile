@@ -2,6 +2,7 @@ import React from 'react';
 import { Tabs } from 'expo-router';
 import { Search, Heart, CalendarClock, MessageSquare, User } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
+import { colors } from '@/theme/tokens';
 
 export default function StudentTabsLayout() {
   const { t } = useTranslation();
@@ -10,11 +11,11 @@ export default function StudentTabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: 'hsl(var(--primary))',
-        tabBarInactiveTintColor: 'hsl(var(--muted-foreground))',
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.mutedForeground,
         tabBarStyle: {
-          backgroundColor: 'hsl(var(--card))',
-          borderTopColor: 'hsl(var(--border))',
+          backgroundColor: colors.card,
+          borderTopColor: colors.border,
           borderTopWidth: 1,
           height: 60,
           paddingBottom: 8,
@@ -64,4 +65,3 @@ export default function StudentTabsLayout() {
     </Tabs>
   );
 }
-

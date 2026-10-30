@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { toast } from '@/components/ui/toast';
+import { colors } from '@/theme/tokens';
 
 export default function PhoneVerifyScreen() {
   const { t } = useTranslation();
@@ -22,20 +23,18 @@ export default function PhoneVerifyScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background p-6 justify-between">
+    <SafeAreaView className="flex-1 justify-between bg-background p-6">
       <View>
         <TouchableOpacity
           onPress={() => router.back()}
-          className="h-10 w-10 items-center justify-center rounded-full bg-muted mb-6"
+          className="mb-6 h-10 w-10 items-center justify-center rounded-full bg-muted"
         >
           <ArrowLeft size={20} className="text-foreground" />
         </TouchableOpacity>
 
         <View className="mb-8">
-          <Text className="text-h1 font-heading text-foreground mb-2">
-            {t('auth.phoneTitle')}
-          </Text>
-          <Text className="text-body font-body text-muted-foreground">
+          <Text className="mb-2 font-heading text-h1 text-foreground">{t('auth.phoneTitle')}</Text>
+          <Text className="font-body text-body text-muted-foreground">
             {t('auth.phoneDescription')}
           </Text>
         </View>
@@ -51,9 +50,9 @@ export default function PhoneVerifyScreen() {
           />
         </View>
 
-        <View className="flex-row items-center bg-card border border-border p-3 rounded-lg">
-          <ShieldCheck size={18} color="hsl(var(--success))" className="mr-2" />
-          <Text className="text-xs font-body text-muted-foreground flex-1">
+        <View className="flex-row items-center rounded-lg border border-border bg-card p-3">
+          <ShieldCheck size={18} color={colors.success} className="mr-2" />
+          <Text className="flex-1 font-body text-xs text-muted-foreground">
             Your number is never shared with owners until your booking or tour is confirmed.
           </Text>
         </View>
@@ -61,15 +60,13 @@ export default function PhoneVerifyScreen() {
 
       <View className="gap-2">
         <Button onPress={handleVerify} size="lg" className="w-full">
-          <Text className="text-primary-foreground font-body-semibold text-body">
+          <Text className="font-body-semibold text-body text-primary-foreground">
             Verify Phone Number
           </Text>
         </Button>
 
         <Button onPress={() => router.back()} variant="ghost" size="default" className="w-full">
-          <Text className="text-muted-foreground font-body-medium">
-            Skip for now
-          </Text>
+          <Text className="font-body-medium text-muted-foreground">Skip for now</Text>
         </Button>
       </View>
     </SafeAreaView>

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/cn';
 import { getErrorMessage } from '@/api/errors';
 import { useTranslation } from 'react-i18next';
+import { colors } from '@/theme/tokens';
 
 export interface ErrorStateProps {
   message?: string;
@@ -22,12 +23,12 @@ export function ErrorState({ message, code, onRetry, className }: ErrorStateProp
   return (
     <View className={cn('flex-1 items-center justify-center p-6 text-center', className)}>
       <View className="mb-4 h-16 w-16 items-center justify-center rounded-full bg-destructive/10">
-        <AlertCircle size={32} color="hsl(var(--destructive))" />
+        <AlertCircle size={32} color={colors.destructive} />
       </View>
-      <Text className="text-center font-heading text-h3 text-foreground mb-2">
+      <Text className="mb-2 text-center font-heading text-h3 text-foreground">
         {t('common.error')}
       </Text>
-      <Text className="text-center font-body text-sm text-muted-foreground mb-6 max-w-xs">
+      <Text className="mb-6 max-w-xs text-center font-body text-sm text-muted-foreground">
         {displayMessage}
       </Text>
       {onRetry && (

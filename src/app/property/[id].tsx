@@ -16,6 +16,7 @@ import { PriceTag } from '@/components/common/price-tag';
 import { Button } from '@/components/ui/button';
 import { Image } from 'expo-image';
 import { toast } from '@/components/ui/toast';
+import { colors } from '@/theme/tokens';
 
 export default function PropertyDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -42,7 +43,7 @@ export default function PropertyDetailScreen() {
       {/* Top Floating Action Bar */}
       <SafeAreaView
         edges={['top']}
-        className="absolute top-0 left-0 right-0 z-20 flex-row items-center justify-between px-4 pt-2"
+        className="absolute left-0 right-0 top-0 z-20 flex-row items-center justify-between px-4 pt-2"
       >
         <TouchableOpacity
           onPress={() => router.back()}
@@ -58,8 +59,8 @@ export default function PropertyDetailScreen() {
           >
             <Heart
               size={20}
-              color={isFavorite ? 'hsl(var(--destructive))' : 'hsl(var(--foreground))'}
-              fill={isFavorite ? 'hsl(var(--destructive))' : 'transparent'}
+              color={isFavorite ? colors.destructive : colors.foreground}
+              fill={isFavorite ? colors.destructive : 'transparent'}
             />
           </TouchableOpacity>
           <TouchableOpacity
@@ -71,7 +72,10 @@ export default function PropertyDetailScreen() {
         </View>
       </SafeAreaView>
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 }}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 100 }}
+      >
         {/* Image Gallery */}
         <View className="h-72 w-full bg-muted">
           <Image
@@ -83,65 +87,63 @@ export default function PropertyDetailScreen() {
 
         <View className="p-4">
           {/* Price Block */}
-          <View className="flex-row items-baseline justify-between mb-2">
+          <View className="mb-2 flex-row items-baseline justify-between">
             <PriceTag paise={property.rentPaise} size="lg" />
-            <View className="bg-primary/10 px-2.5 py-1 rounded-md">
-              <Text className="text-xs font-body-semibold text-primary capitalize">
+            <View className="rounded-md bg-primary/10 px-2.5 py-1">
+              <Text className="font-body-semibold text-xs capitalize text-primary">
                 {property.roomType.replace('_', ' ')}
               </Text>
             </View>
           </View>
 
-          <Text className="text-h3 font-heading text-foreground mb-2">
-            {property.title}
-          </Text>
+          <Text className="mb-2 font-heading text-h3 text-foreground">{property.title}</Text>
 
-          <View className="flex-row items-center text-muted-foreground mb-4">
-            <MapPin size={14} className="text-muted-foreground mr-1" />
-            <Text className="text-sm font-body text-muted-foreground">
+          <View className="mb-4 flex-row items-center text-muted-foreground">
+            <MapPin size={14} className="mr-1 text-muted-foreground" />
+            <Text className="font-body text-sm text-muted-foreground">
               {property.locality}, {property.city} (Exact address revealed after approval)
             </Text>
           </View>
 
           {/* Deposit & Bills breakdown */}
-          <View className="bg-card border border-border p-3.5 rounded-xl mb-5 flex-row justify-around shadow-elevation-1">
+          <View className="shadow-elevation-1 mb-5 flex-row justify-around rounded-xl border border-border bg-card p-3.5">
             <View className="items-center">
-              <Text className="text-xs font-body text-muted-foreground">Security Deposit</Text>
-              <Text className="text-sm font-body-semibold text-foreground mt-0.5">
+              <Text className="font-body text-xs text-muted-foreground">Security Deposit</Text>
+              <Text className="mt-0.5 font-body-semibold text-sm text-foreground">
                 ₹{property.depositPaise / 100}
               </Text>
             </View>
             <View className="w-[1px] bg-border" />
             <View className="items-center">
-              <Text className="text-xs font-body text-muted-foreground">Maintenance</Text>
-              <Text className="text-sm font-body-semibold text-foreground mt-0.5">
+              <Text className="font-body text-xs text-muted-foreground">Maintenance</Text>
+              <Text className="mt-0.5 font-body-semibold text-sm text-foreground">
                 {property.maintenancePaise > 0 ? `₹${property.maintenancePaise / 100}` : 'Included'}
               </Text>
             </View>
             <View className="w-[1px] bg-border" />
             <View className="items-center">
-              <Text className="text-xs font-body text-muted-foreground">Gender Policy</Text>
-              <Text className="text-sm font-body-semibold text-foreground mt-0.5 capitalize">
+              <Text className="font-body text-xs text-muted-foreground">Gender Policy</Text>
+              <Text className="mt-0.5 font-body-semibold text-sm capitalize text-foreground">
                 {property.genderPolicy}
               </Text>
             </View>
           </View>
 
           {/* Owner Trust Badge */}
-          <View className="bg-muted/40 border border-border p-4 rounded-xl mb-5 flex-row items-center">
-            <View className="h-12 w-12 rounded-full bg-primary/10 items-center justify-center mr-3">
-              <ShieldCheck size={24} color="hsl(var(--primary))" />
+          <View className="mb-5 flex-row items-center rounded-xl border border-border bg-muted/40 p-4">
+            <View className="mr-3 h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+              <ShieldCheck size={24} color={colors.primary} />
             </View>
             <View className="flex-1">
               <View className="flex-row items-center">
-                <Text className="text-body font-body-semibold text-foreground mr-1.5">
+                <Text className="mr-1.5 font-body-semibold text-body text-foreground">
                   {owner?.displayName ?? 'Verified Owner'}
                 </Text>
-                <View className="bg-success/15 px-1.5 py-0.2 rounded">
+                <View className="py-0.2 rounded bg-success/15 px-1.5">
                   <Text className="text-[10px] font-bold text-success">VERIFIED</Text>
                 </View>
               </View>
-              <Text className="text-xs font-body text-muted-foreground mt-0.5">
+              <Text className="mt-0.5 font-body text-xs text-muted-foreground">
                 Government KYC Verified • High response rate (98%)
               </Text>
             </View>
@@ -149,17 +151,15 @@ export default function PropertyDetailScreen() {
 
           {/* Amenities Grid */}
           <View className="mb-6">
-            <Text className="text-body font-heading text-foreground mb-3">
-              Amenities
-            </Text>
+            <Text className="mb-3 font-heading text-body text-foreground">Amenities</Text>
             <View className="flex-row flex-wrap gap-2">
               {property.amenities.map((amenity) => (
                 <View
                   key={amenity}
-                  className="bg-card border border-border px-3 py-2 rounded-lg flex-row items-center"
+                  className="flex-row items-center rounded-lg border border-border bg-card px-3 py-2"
                 >
-                  <CheckCircle2 size={14} color="hsl(var(--success))" className="mr-1.5" />
-                  <Text className="text-xs font-body text-foreground">{amenity}</Text>
+                  <CheckCircle2 size={14} color={colors.success} className="mr-1.5" />
+                  <Text className="font-body text-xs text-foreground">{amenity}</Text>
                 </View>
               ))}
             </View>
@@ -167,14 +167,14 @@ export default function PropertyDetailScreen() {
 
           {/* Nearby Colleges */}
           <View className="mb-6">
-            <Text className="text-body font-heading text-foreground mb-3">
+            <Text className="mb-3 font-heading text-body text-foreground">
               Nearby Colleges & Landmarks
             </Text>
             <View className="gap-2">
               {property.nearbyColleges.map((college) => (
-                <View key={college} className="flex-row items-center bg-muted/50 p-2.5 rounded-lg">
-                  <MapPin size={14} className="text-primary mr-2" />
-                  <Text className="text-xs font-body text-foreground">{college}</Text>
+                <View key={college} className="flex-row items-center rounded-lg bg-muted/50 p-2.5">
+                  <MapPin size={14} className="mr-2 text-primary" />
+                  <Text className="font-body text-xs text-foreground">{college}</Text>
                 </View>
               ))}
             </View>
@@ -183,7 +183,7 @@ export default function PropertyDetailScreen() {
       </ScrollView>
 
       {/* Sticky Bottom CTA Bar */}
-      <View className="absolute bottom-0 left-0 right-0 bg-card border-t border-border p-4 flex-row items-center gap-3 shadow-elevation-2">
+      <View className="shadow-elevation-2 absolute bottom-0 left-0 right-0 flex-row items-center gap-3 border-t border-border bg-card p-4">
         <TouchableOpacity
           onPress={() => router.push(`/chat/inquiry-1`)}
           className="h-12 w-12 items-center justify-center rounded-xl border border-border bg-muted/50"
@@ -194,11 +194,9 @@ export default function PropertyDetailScreen() {
 
         <TouchableOpacity
           onPress={() => toast.info('Tour booking opens in Phase M3')}
-          className="flex-1 py-3.5 rounded-xl border border-border bg-muted/60 items-center justify-center"
+          className="flex-1 items-center justify-center rounded-xl border border-border bg-muted/60 py-3.5"
         >
-          <Text className="text-xs font-body-semibold text-foreground">
-            Request Tour
-          </Text>
+          <Text className="font-body-semibold text-xs text-foreground">Request Tour</Text>
         </TouchableOpacity>
 
         <Button
@@ -206,9 +204,7 @@ export default function PropertyDetailScreen() {
           size="default"
           className="flex-1 py-3.5"
         >
-          <Text className="text-primary-foreground font-body-semibold text-xs">
-            Apply to Book
-          </Text>
+          <Text className="font-body-semibold text-xs text-primary-foreground">Apply to Book</Text>
         </Button>
       </View>
     </View>

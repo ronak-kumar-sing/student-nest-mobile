@@ -1,10 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Text,
-  TextInput,
-  View,
-  type TextInputProps,
-} from 'react-native';
+import { Text, TextInput, View, type TextInputProps } from 'react-native';
 import { cn } from '@/lib/cn';
 
 /* ─────────────────────────── types ─────────────────────────────── */
@@ -39,16 +34,7 @@ interface InputProps extends TextInputProps {
  */
 const Input = React.forwardRef<React.ElementRef<typeof TextInput>, InputProps>(
   (
-    {
-      label,
-      error,
-      helperText,
-      containerClassName,
-      className,
-      onFocus,
-      onBlur,
-      ...textInputProps
-    },
+    { label, error, helperText, containerClassName, className, onFocus, onBlur, ...textInputProps },
     ref,
   ) => {
     const [isFocused, setIsFocused] = useState(false);
@@ -66,10 +52,7 @@ const Input = React.forwardRef<React.ElementRef<typeof TextInput>, InputProps>(
     return (
       <View className={cn('gap-1.5', containerClassName)}>
         {label ? (
-          <Text
-            className="font-body-medium text-sm text-foreground"
-            maxFontSizeMultiplier={1.3}
-          >
+          <Text className="font-body-medium text-sm text-foreground" maxFontSizeMultiplier={1.3}>
             {label}
           </Text>
         ) : null}
@@ -100,10 +83,7 @@ const Input = React.forwardRef<React.ElementRef<typeof TextInput>, InputProps>(
             {error}
           </Text>
         ) : helperText ? (
-          <Text
-            className="font-body text-xs text-muted-foreground"
-            maxFontSizeMultiplier={1.3}
-          >
+          <Text className="font-body text-xs text-muted-foreground" maxFontSizeMultiplier={1.3}>
             {helperText}
           </Text>
         ) : null}

@@ -6,6 +6,7 @@ import BottomSheet, {
   type BottomSheetBackdropProps,
 } from '@gorhom/bottom-sheet';
 import { cn } from '@/lib/cn';
+import { colors } from '@/theme/tokens';
 
 export interface SheetProps extends Omit<BottomSheetProps, 'children'> {
   children: React.ReactNode;
@@ -35,11 +36,11 @@ export const Sheet = forwardRef<BottomSheet, SheetProps>(
         enablePanDownToClose
         backdropComponent={renderBackdrop}
         backgroundStyle={{ backgroundColor: 'transparent' }}
-        handleIndicatorStyle={{ backgroundColor: 'hsl(var(--muted-foreground))', width: 40 }}
+        handleIndicatorStyle={{ backgroundColor: colors.mutedForeground, width: 40 }}
         onClose={onClose}
         {...props}
       >
-        <BottomSheetView className={cn('flex-1 bg-card px-4 pb-6 pt-2 rounded-t-xl', className)}>
+        <BottomSheetView className={cn('flex-1 rounded-t-xl bg-card px-4 pb-6 pt-2', className)}>
           {children}
         </BottomSheetView>
       </BottomSheet>

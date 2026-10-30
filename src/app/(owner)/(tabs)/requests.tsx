@@ -48,20 +48,20 @@ export default function OwnerRequestsScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>
-      <View className="px-4 py-3 bg-card border-b border-border">
-        <Text className="text-h2 font-heading text-foreground">{t('tabs.requests')}</Text>
+      <View className="border-b border-border bg-card px-4 py-3">
+        <Text className="font-heading text-h2 text-foreground">{t('tabs.requests')}</Text>
 
-        <View className="flex-row bg-muted p-1 rounded-xl mt-3">
+        <View className="mt-3 flex-row rounded-xl bg-muted p-1">
           <TouchableOpacity
             onPress={() => setActiveTab('bookings')}
             className={cn(
-              'flex-1 py-2 rounded-lg items-center',
-              activeTab === 'bookings' ? 'bg-card shadow-elevation-1' : '',
+              'flex-1 items-center rounded-lg py-2',
+              activeTab === 'bookings' ? 'shadow-elevation-1 bg-card' : 'bg-transparent',
             )}
           >
             <Text
               className={cn(
-                'text-xs font-body-semibold',
+                'font-body-semibold text-xs',
                 activeTab === 'bookings' ? 'text-foreground' : 'text-muted-foreground',
               )}
             >
@@ -72,13 +72,13 @@ export default function OwnerRequestsScreen() {
           <TouchableOpacity
             onPress={() => setActiveTab('tours')}
             className={cn(
-              'flex-1 py-2 rounded-lg items-center',
-              activeTab === 'tours' ? 'bg-card shadow-elevation-1' : '',
+              'flex-1 items-center rounded-lg py-2',
+              activeTab === 'tours' ? 'shadow-elevation-1 bg-card' : 'bg-transparent',
             )}
           >
             <Text
               className={cn(
-                'text-xs font-body-semibold',
+                'font-body-semibold text-xs',
                 activeTab === 'tours' ? 'text-foreground' : 'text-muted-foreground',
               )}
             >
@@ -108,60 +108,60 @@ export default function OwnerRequestsScreen() {
                 return (
                   <View
                     key={booking.id}
-                    className="bg-card rounded-xl border border-border p-4 shadow-elevation-1"
+                    className="shadow-elevation-1 rounded-xl border border-border bg-card p-4"
                   >
-                    <View className="flex-row items-center justify-between mb-2">
+                    <View className="mb-2 flex-row items-center justify-between">
                       <StatusPill status={booking.status} />
-                      <Text className="text-xs font-body text-muted-foreground">
+                      <Text className="font-body text-xs text-muted-foreground">
                         {formatIST(booking.createdAt, 'dd MMM yyyy')}
                       </Text>
                     </View>
 
-                    <Text className="text-body font-body-semibold text-foreground mb-0.5">
+                    <Text className="mb-0.5 font-body-semibold text-body text-foreground">
                       {student?.displayName ?? 'Verified Student'}
                     </Text>
 
-                    <Text className="text-xs font-body text-primary mb-2">
-                      {property?.title}
-                    </Text>
+                    <Text className="mb-2 font-body text-xs text-primary">{property?.title}</Text>
 
-                    <View className="bg-muted/50 p-2.5 rounded-lg mb-3 gap-1">
+                    <View className="mb-3 gap-1 rounded-lg bg-muted/50 p-2.5">
                       <View className="flex-row justify-between">
-                        <Text className="text-xs font-body text-muted-foreground">Move-in:</Text>
-                        <Text className="text-xs font-body-medium text-foreground">
+                        <Text className="font-body text-xs text-muted-foreground">Move-in:</Text>
+                        <Text className="font-body-medium text-xs text-foreground">
                           {formatIST(booking.moveInDate, 'dd MMM yyyy')}
                         </Text>
                       </View>
                       <View className="flex-row justify-between">
-                        <Text className="text-xs font-body text-muted-foreground">Duration:</Text>
-                        <Text className="text-xs font-body-medium text-foreground">
+                        <Text className="font-body text-xs text-muted-foreground">Duration:</Text>
+                        <Text className="font-body-medium text-xs text-foreground">
                           {booking.durationMonths} months
                         </Text>
                       </View>
                       <View className="flex-row justify-between">
-                        <Text className="text-xs font-body text-muted-foreground">Offered Rent:</Text>
+                        <Text className="font-body text-xs text-muted-foreground">
+                          Offered Rent:
+                        </Text>
                         <PriceTag paise={booking.agreedRentPaise} size="sm" />
                       </View>
                     </View>
 
                     {booking.status === 'pending' && (
-                      <View className="flex-row gap-2 pt-2 border-t border-border">
+                      <View className="flex-row gap-2 border-t border-border pt-2">
                         <TouchableOpacity
                           onPress={() => handleApprove(booking.id)}
-                          className="flex-1 bg-primary py-2.5 rounded-lg flex-row items-center justify-center"
+                          className="flex-1 flex-row items-center justify-center rounded-lg bg-primary py-2.5"
                         >
                           <CheckCircle2 size={16} color="white" className="mr-1.5" />
-                          <Text className="text-xs font-body-semibold text-primary-foreground">
+                          <Text className="font-body-semibold text-xs text-primary-foreground">
                             Approve
                           </Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity
                           onPress={() => handleReject(booking.id)}
-                          className="px-4 py-2.5 rounded-lg border border-border flex-row items-center justify-center bg-muted/40"
+                          className="flex-row items-center justify-center rounded-lg border border-border bg-muted/40 px-4 py-2.5"
                         >
-                          <XCircle size={16} className="text-destructive mr-1.5" />
-                          <Text className="text-xs font-body-semibold text-destructive">
+                          <XCircle size={16} className="mr-1.5 text-destructive" />
+                          <Text className="font-body-semibold text-xs text-destructive">
                             Decline
                           </Text>
                         </TouchableOpacity>
@@ -185,25 +185,25 @@ export default function OwnerRequestsScreen() {
               return (
                 <View
                   key={tour.id}
-                  className="bg-card rounded-xl border border-border p-4 shadow-elevation-1"
+                  className="shadow-elevation-1 rounded-xl border border-border bg-card p-4"
                 >
-                  <View className="flex-row items-center justify-between mb-2">
+                  <View className="mb-2 flex-row items-center justify-between">
                     <StatusPill status={tour.status} />
-                    <Text className="text-xs font-body text-muted-foreground">
+                    <Text className="font-body text-xs text-muted-foreground">
                       {formatIST(tour.createdAt, 'dd MMM yyyy')}
                     </Text>
                   </View>
 
-                  <Text className="text-body font-body-semibold text-foreground mb-1">
+                  <Text className="mb-1 font-body-semibold text-body text-foreground">
                     {property?.title}
                   </Text>
 
                   {tour.confirmedSlot ? (
-                    <Text className="text-xs font-body text-success">
+                    <Text className="font-body text-xs text-success">
                       Confirmed for: {formatIST(tour.confirmedSlot, 'dd MMM yyyy, hh:mm a')}
                     </Text>
                   ) : (
-                    <Text className="text-xs font-body text-muted-foreground">
+                    <Text className="font-body text-xs text-muted-foreground">
                       Slots proposed: {tour.proposedSlots.length}
                     </Text>
                   )}

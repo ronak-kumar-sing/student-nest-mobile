@@ -55,17 +55,10 @@ function Skeleton({ className }: SkeletonProps) {
   }));
 
   if (reducedMotion) {
-    return (
-      <View className={cn('rounded-md bg-muted opacity-50', className)} />
-    );
+    return <View className={cn('rounded-md bg-muted opacity-50', className)} />;
   }
 
-  return (
-    <Animated.View
-      style={animatedStyle}
-      className={cn('rounded-md bg-muted', className)}
-    />
-  );
+  return <Animated.View style={animatedStyle} className={cn('rounded-md bg-muted', className)} />;
 }
 
 export { Skeleton };

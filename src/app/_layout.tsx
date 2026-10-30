@@ -4,7 +4,12 @@ import React, { useEffect } from 'react';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useFonts, Inter_400Regular, Inter_500Medium, Inter_600SemiBold } from '@expo-google-fonts/inter';
+import {
+  useFonts,
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+} from '@expo-google-fonts/inter';
 import {
   useFonts as useJakartaFonts,
   PlusJakartaSans_600SemiBold,
@@ -77,18 +82,12 @@ export default function RootLayout() {
               name="booking/[id]"
               options={{ headerShown: false, presentation: 'card' }}
             />
-            <Stack.Screen
-              name="tour/[id]"
-              options={{ headerShown: false, presentation: 'card' }}
-            />
+            <Stack.Screen name="tour/[id]" options={{ headerShown: false, presentation: 'card' }} />
             <Stack.Screen
               name="chat/[threadId]"
               options={{ headerShown: false, presentation: 'card' }}
             />
-            <Stack.Screen
-              name="dev"
-              options={{ headerShown: false, presentation: 'modal' }}
-            />
+            <Stack.Screen name="dev" options={{ headerShown: false, presentation: 'modal' }} />
             <Stack.Screen name="+not-found" options={{ title: 'Oops!' }} />
           </Stack>
           <Toaster />

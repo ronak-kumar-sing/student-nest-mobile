@@ -39,22 +39,18 @@ export default function OtpScreen() {
     <SafeAreaView className="flex-1 bg-background p-6">
       <TouchableOpacity
         onPress={() => router.back()}
-        className="h-10 w-10 items-center justify-center rounded-full bg-muted mb-6"
+        className="mb-6 h-10 w-10 items-center justify-center rounded-full bg-muted"
       >
         <ArrowLeft size={20} className="text-foreground" />
       </TouchableOpacity>
 
       <View className="mb-8">
-        <Text className="text-h1 font-heading text-foreground mb-2">
-          {t('auth.otpTitle')}
-        </Text>
-        <Text className="text-body font-body text-muted-foreground">
+        <Text className="mb-2 font-heading text-h1 text-foreground">{t('auth.otpTitle')}</Text>
+        <Text className="font-body text-body text-muted-foreground">
           {t('auth.otpDescription', { email })}
         </Text>
-        <View className="mt-2 bg-info/10 border border-info/20 px-3 py-1.5 rounded-md self-start">
-          <Text className="text-xs font-body-medium text-info">
-            💡 Mock Mode: Enter 000000
-          </Text>
+        <View className="mt-2 self-start rounded-md border border-info/20 bg-info/10 px-3 py-1.5">
+          <Text className="font-body-medium text-xs text-info">💡 Mock Mode: Enter 000000</Text>
         </View>
       </View>
 
@@ -78,23 +74,21 @@ export default function OtpScreen() {
         onPress={handleVerify}
         size="lg"
         disabled={otp.length !== 6}
-        className="w-full mt-2 mb-6"
+        className="mb-6 mt-2 w-full"
       >
-        <Text className="text-primary-foreground font-body-semibold text-body">
+        <Text className="font-body-semibold text-body text-primary-foreground">
           Verify & Continue
         </Text>
       </Button>
 
       <View className="items-center">
         {countdown > 0 ? (
-          <Text className="text-sm font-body text-muted-foreground">
+          <Text className="font-body text-sm text-muted-foreground">
             {t('auth.resendIn', { seconds: countdown })}
           </Text>
         ) : (
           <TouchableOpacity onPress={() => setCountdown(30)}>
-            <Text className="text-sm font-body-semibold text-primary">
-              {t('auth.resendCode')}
-            </Text>
+            <Text className="font-body-semibold text-sm text-primary">{t('auth.resendCode')}</Text>
           </TouchableOpacity>
         )}
       </View>

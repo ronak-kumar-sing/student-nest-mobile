@@ -75,11 +75,9 @@ export const useSessionStore = create<SessionState>()(
           user: state.user ? { ...state.user, role } : null,
         })),
 
-      setOnboarded: (value) =>
-        set({ isOnboarded: value }),
+      setOnboarded: (value) => set({ isOnboarded: value }),
 
-      logout: () =>
-        set({ ...initialState }),
+      logout: () => set({ ...initialState }),
     }),
     {
       name: 'student-nest-session',

@@ -8,6 +8,7 @@ import { StatusPill } from '@/components/common/status-pill';
 import { formatIST } from '@/lib/dates';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/toast';
+import { colors } from '@/theme/tokens';
 
 export default function TourDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -17,14 +18,14 @@ export default function TourDetailScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>
-      <View className="px-4 py-3 bg-card border-b border-border flex-row items-center justify-between">
+      <View className="flex-row items-center justify-between border-b border-border bg-card px-4 py-3">
         <TouchableOpacity
           onPress={() => router.back()}
           className="h-9 w-9 items-center justify-center rounded-full bg-muted"
         >
           <ArrowLeft size={18} className="text-foreground" />
         </TouchableOpacity>
-        <Text className="text-body font-heading text-foreground">Tour Details</Text>
+        <Text className="font-heading text-body text-foreground">Tour Details</Text>
         <View className="w-9" />
       </View>
 
@@ -32,47 +33,44 @@ export default function TourDetailScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
       >
-        <View className="flex-row items-center justify-between mb-4">
+        <View className="mb-4 flex-row items-center justify-between">
           <StatusPill status={tour.status} />
-          <Text className="text-xs font-body text-muted-foreground">
+          <Text className="font-body text-xs text-muted-foreground">
             Requested {formatIST(tour.createdAt, 'dd MMM yyyy')}
           </Text>
         </View>
 
-        <View className="bg-card border border-border p-4 rounded-xl mb-5 shadow-elevation-1">
-          <Text className="text-body font-heading text-foreground mb-1">
-            {property?.title}
-          </Text>
+        <View className="shadow-elevation-1 mb-5 rounded-xl border border-border bg-card p-4">
+          <Text className="mb-1 font-heading text-body text-foreground">{property?.title}</Text>
           <View className="flex-row items-center text-muted-foreground">
-            <MapPin size={13} className="text-muted-foreground mr-1" />
-            <Text className="text-xs font-body text-muted-foreground">
+            <MapPin size={13} className="mr-1 text-muted-foreground" />
+            <Text className="font-body text-xs text-muted-foreground">
               {tour.address ?? `${property?.locality}, ${property?.city}`}
             </Text>
           </View>
         </View>
 
         {tour.confirmedSlot ? (
-          <View className="bg-success/10 border border-success/30 p-4 rounded-xl mb-5">
-            <View className="flex-row items-center mb-1">
-              <CheckCircle2 size={16} color="hsl(var(--success))" className="mr-2" />
-              <Text className="text-sm font-body-semibold text-success">Tour Confirmed!</Text>
+          <View className="mb-5 rounded-xl border border-success/30 bg-success/10 p-4">
+            <View className="mb-1 flex-row items-center">
+              <CheckCircle2 size={16} color={colors.success} className="mr-2" />
+              <Text className="font-body-semibold text-sm text-success">Tour Confirmed!</Text>
             </View>
-            <Text className="text-xs font-body text-foreground">
+            <Text className="font-body text-xs text-foreground">
               Date & Time: {formatIST(tour.confirmedSlot, 'EEEE, dd MMMM yyyy, hh:mm a')}
             </Text>
-            <Text className="text-xs font-body text-muted-foreground mt-2">
-              Please arrive 5 minutes before scheduled time. If you need to reschedule, notify the owner via chat.
+            <Text className="mt-2 font-body text-xs text-muted-foreground">
+              Please arrive 5 minutes before scheduled time. If you need to reschedule, notify the
+              owner via chat.
             </Text>
           </View>
         ) : (
-          <View className="bg-card border border-border p-4 rounded-xl mb-5 shadow-elevation-1">
-            <Text className="text-sm font-body-semibold text-foreground mb-2">
-              Proposed Slots
-            </Text>
+          <View className="shadow-elevation-1 mb-5 rounded-xl border border-border bg-card p-4">
+            <Text className="mb-2 font-body-semibold text-sm text-foreground">Proposed Slots</Text>
             {tour.proposedSlots.map((slot, index) => (
-              <View key={index} className="flex-row items-center py-2 border-b border-border/40">
-                <Clock size={14} className="text-primary mr-2" />
-                <Text className="text-xs font-body text-foreground">
+              <View key={index} className="flex-row items-center border-b border-border/40 py-2">
+                <Clock size={14} className="mr-2 text-primary" />
+                <Text className="font-body text-xs text-foreground">
                   {formatIST(slot, 'dd MMM yyyy, hh:mm a')}
                 </Text>
               </View>
@@ -84,7 +82,7 @@ export default function TourDetailScreen() {
           onPress={() => toast.info('Tour cancelled')}
           variant="outline"
           size="default"
-          className="w-full mt-4"
+          className="mt-4 w-full"
         >
           Cancel Tour
         </Button>
