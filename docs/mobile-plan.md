@@ -8,7 +8,7 @@
 
 | # | Feature | Phase | Mobile Status | Backend Status | Notes |
 | --- | --- | --- | --- | --- | --- |
-| 00 | Foundation | M0 | ✅ mock | planned | Scaffold, UI kit, mock core, tab layouts |
+| 00 | Foundation | M0 | ✅ mock | planned | Scaffold, UI kit, mock core, tab layouts, EAS linked, NativeWind tokens verified |
 | 01 | Auth | M1 | ⏳ planned | planned | Email OTP, phone verify |
 | 02 | Users & Profiles | M1 | ⏳ planned | planned | Profile setup/edit, prefs |
 | 03 | Owner KYC | M2 | ⏳ planned | planned | Document capture flow |
