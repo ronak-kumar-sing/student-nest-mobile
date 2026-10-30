@@ -1,18 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Heart, MapPin, Trash2 } from 'lucide-react-native';
-import { getDB } from '@/api/mock/db';
+import { getDB, removeFavorite } from '@/api/mock/db';
 import { PriceTag } from '@/components/common/price-tag';
 import { EmptyState } from '@/components/common/empty-state';
 import { Image } from 'expo-image';
 import { useTranslation } from 'react-i18next';
+import { toast } from '@/components/ui/toast';
 
 export default function SavedScreen() {
   const { t } = useTranslation();
   const db = getDB();
-  const savedProperties = db.properties.filter((p) => db.favorites.includes(p.id));
+  const [favoriteIds, setFavoriteIds] = useState<string[]>(db.favorites);
+
+  const savedProperties = db.properties.filter((p) => favoriteIds.includes(p.id));
+
+  const handleRemove = (propertyId: string) => {
+    removeFavorite(propertyId);
+    setFavoriteIds((prev) => prev.filter((id) => id !== propertyId));
+    toast.info('Removed from saved properties');
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>
@@ -34,7 +43,7 @@ export default function SavedScreen() {
       ) : (
         <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
+          contentContainerStyle={{ padding: 16, paddingBottom: 110 }}
         >
           <View className="gap-4">
             {savedProperties.map((property) => (
@@ -74,9 +83,7 @@ export default function SavedScreen() {
                       {property.roomType.replace('_', ' ')}
                     </Text>
                     <TouchableOpacity
-                      onPress={() => {
-                        db.favorites = db.favorites.filter((id) => id !== property.id);
-                      }}
+                      onPress={() => handleRemove(property.id)}
                       className="p-1"
                     >
                       <Trash2 size={14} className="text-destructive" />

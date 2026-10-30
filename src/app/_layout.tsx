@@ -22,6 +22,10 @@ import { Toaster } from '@/components/ui/toast';
 import { OfflineBanner } from '@/components/common/offline-banner';
 import { setReducedMotion } from '@/lib/haptics';
 import { useReducedMotion } from 'react-native-reanimated';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
+import * as SystemUI from 'expo-system-ui';
+import { NavigationBar } from 'expo-navigation-bar';
+import { Platform } from 'react-native';
 
 // Prevent splash screen from auto-hiding until assets are loaded
 SplashScreen.preventAutoHideAsync().catch(() => {});
@@ -55,6 +59,10 @@ export default function RootLayout() {
   }, [isReducedMotion]);
 
   useEffect(() => {
+    SystemUI.setBackgroundColorAsync('#0D0E11').catch(() => {});
+  }, []);
+
+  useEffect(() => {
     if (interLoaded && jakartaLoaded) {
       SplashScreen.hideAsync().catch(() => {});
     }
@@ -67,32 +75,35 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <QueryClientProvider client={queryClient}>
-          <OfflineBanner />
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="index" />
-            <Stack.Screen name="(auth)" options={{ animation: 'fade' }} />
-            <Stack.Screen name="(student)" options={{ animation: 'fade' }} />
-            <Stack.Screen name="(owner)" options={{ animation: 'fade' }} />
-            <Stack.Screen
-              name="property/[id]"
-              options={{ headerShown: false, presentation: 'card' }}
-            />
-            <Stack.Screen
-              name="booking/[id]"
-              options={{ headerShown: false, presentation: 'card' }}
-            />
-            <Stack.Screen name="tour/[id]" options={{ headerShown: false, presentation: 'card' }} />
-            <Stack.Screen
-              name="chat/[threadId]"
-              options={{ headerShown: false, presentation: 'card' }}
-            />
-            <Stack.Screen name="dev" options={{ headerShown: false, presentation: 'modal' }} />
-            <Stack.Screen name="+not-found" options={{ title: 'Oops!' }} />
-          </Stack>
-          <Toaster />
-          <StatusBar style="auto" />
-        </QueryClientProvider>
+        <KeyboardProvider>
+          <QueryClientProvider client={queryClient}>
+            <OfflineBanner />
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="index" />
+              <Stack.Screen name="(auth)" options={{ animation: 'fade' }} />
+              <Stack.Screen name="(student)" options={{ animation: 'fade' }} />
+              <Stack.Screen name="(owner)" options={{ animation: 'fade' }} />
+              <Stack.Screen
+                name="property/[id]"
+                options={{ headerShown: false, presentation: 'card' }}
+              />
+              <Stack.Screen
+                name="booking/[id]"
+                options={{ headerShown: false, presentation: 'card' }}
+              />
+              <Stack.Screen name="tour/[id]" options={{ headerShown: false, presentation: 'card' }} />
+              <Stack.Screen
+                name="chat/[threadId]"
+                options={{ headerShown: false, presentation: 'card' }}
+              />
+              <Stack.Screen name="dev" options={{ headerShown: false, presentation: 'modal' }} />
+              <Stack.Screen name="+not-found" options={{ title: 'Oops!' }} />
+            </Stack>
+            <Toaster />
+            <StatusBar style="light" />
+            {Platform.OS === 'android' && <NavigationBar style="dark" />}
+          </QueryClientProvider>
+        </KeyboardProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

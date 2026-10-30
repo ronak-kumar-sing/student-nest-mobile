@@ -3,7 +3,6 @@ import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import {
-  ShieldCheck,
   Phone,
   Bell,
   Users,
@@ -15,7 +14,7 @@ import {
   ChevronRight,
 } from 'lucide-react-native';
 import { useSessionStore } from '@/stores/session';
-import { Avatar } from '@/components/ui/avatar';
+import { ReflectiveCard } from '@/components/common/reflective-card';
 import { useTranslation } from 'react-i18next';
 import { colors } from '@/theme/tokens';
 
@@ -48,35 +47,21 @@ export default function ProfileScreen() {
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
+        contentContainerStyle={{ padding: 16, paddingBottom: 110 }}
       >
-        {/* User Card */}
-        <View className="shadow-elevation-1 mb-6 flex-row items-center rounded-xl border border-border bg-card p-4">
-          <Avatar
-            name={user?.displayName ?? 'Student User'}
-            src={user?.avatarUrl}
-            size="lg"
-            className="mr-4"
+        {/* Reflective Metallic Identity Card */}
+        <View className="mb-6">
+          <ReflectiveCard
+            name={user?.displayName ?? 'Rahul Sharma'}
+            role={role === 'owner' ? 'Verified Property Owner' : 'Verified Student Member'}
+            badge="Verified Member"
+            status="Active"
+            statusColor="#22c55e"
+            idLabel={role === 'owner' ? 'Owner License ID' : 'Student Nest ID'}
+            idValue={`NEST-${(user?.id || 'STU108').toUpperCase()}-2026`}
+            theme="dark"
+            radius={20}
           />
-          <View className="flex-1">
-            <Text className="font-heading text-h3 text-foreground">
-              {user?.displayName ?? 'Rahul Sharma'}
-            </Text>
-            <Text className="mb-1.5 font-body text-xs text-muted-foreground">
-              {user?.email ?? 'rahul.sharma@example.com'}
-            </Text>
-            <View className="flex-row items-center">
-              <View className="mr-2 rounded bg-primary/10 px-2 py-0.5">
-                <Text className="font-body-semibold text-[11px] capitalize text-primary">
-                  {role ?? 'Student'}
-                </Text>
-              </View>
-              <View className="flex-row items-center">
-                <ShieldCheck size={12} color={colors.success} className="mr-0.5" />
-                <Text className="font-body text-[11px] text-success">Verified</Text>
-              </View>
-            </View>
-          </View>
         </View>
 
         {/* Menu Sections */}

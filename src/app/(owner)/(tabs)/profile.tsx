@@ -3,7 +3,6 @@ import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import {
-  ShieldCheck,
   FileCheck,
   Building2,
   GraduationCap,
@@ -11,9 +10,13 @@ import {
   LogOut,
   Wrench,
   ChevronRight,
+  ShieldCheck,
+  Sparkles,
 } from 'lucide-react-native';
 import { useSessionStore } from '@/stores/session';
-import { Avatar } from '@/components/ui/avatar';
+import { ReflectiveCard } from '@/components/common/reflective-card';
+import { SpotlightCard } from '@/components/common/spotlight-card';
+import { PeekRating } from '@/components/common/peek-rating';
 import { toast } from '@/components/ui/toast';
 import { colors } from '@/theme/tokens';
 
@@ -45,33 +48,87 @@ export default function OwnerProfileScreen() {
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
+        contentContainerStyle={{ padding: 16, paddingBottom: 110 }}
       >
-        {/* User Card */}
-        <View className="shadow-elevation-1 mb-6 flex-row items-center rounded-xl border border-border bg-card p-4">
-          <Avatar
+        {/* Reflective Metallic Identity Card */}
+        <View className="mb-5">
+          <ReflectiveCard
             name={user?.displayName ?? 'Amit Kumar'}
-            src={user?.avatarUrl}
-            size="lg"
-            className="mr-4"
+            role="Verified Property Owner"
+            badge="Verified Host"
+            status="Active"
+            statusColor="#22c55e"
+            idLabel="Owner License ID"
+            idValue={`NEST-${(user?.id || 'OWN101').toUpperCase()}-2026`}
+            theme="dark"
+            radius={20}
           />
-          <View className="flex-1">
-            <Text className="font-heading text-h3 text-foreground">
-              {user?.displayName ?? 'Amit Kumar'}
-            </Text>
-            <Text className="mb-1.5 font-body text-xs text-muted-foreground">
-              {user?.email ?? 'amit.kumar@example.com'}
-            </Text>
-            <View className="flex-row items-center">
-              <View className="mr-2 rounded bg-primary/10 px-2 py-0.5">
-                <Text className="font-body-semibold text-[11px] text-primary">Property Owner</Text>
+        </View>
+
+        {/* Owner Spotlight Reputation & Trust Showcase */}
+        <View className="mb-6">
+          <SpotlightCard
+            theme="dark"
+            spotlightColor="#10B981"
+            intensity={0.28}
+            spotlightSize={260}
+            borderGlow={0.65}
+            ambient={true}
+            flare={true}
+            radius={22}
+          >
+            <View className="p-4">
+              <View className="mb-3 flex-row items-center justify-between">
+                <View className="flex-row items-center gap-2">
+                  <View className="h-8 w-8 items-center justify-center rounded-full bg-emerald-500/20">
+                    <ShieldCheck size={18} color="#10B981" />
+                  </View>
+                  <View>
+                    <Text className="font-heading text-sm text-white">Trust & Rating Score</Text>
+                    <Text className="text-[11px] text-zinc-400">Owner Hospitality Index</Text>
+                  </View>
+                </View>
+                <View className="flex-row items-center gap-1 rounded-full bg-emerald-500/15 px-2.5 py-1 border border-emerald-500/30">
+                  <Sparkles size={11} color="#10B981" />
+                  <Text className="text-[11px] font-bold text-emerald-400">4.9 / 5.0</Text>
+                </View>
               </View>
-              <View className="flex-row items-center">
-                <ShieldCheck size={12} color={colors.success} className="mr-0.5" />
-                <Text className="font-body text-[11px] text-success">Verified</Text>
+
+              {/* Interactive PeekRating */}
+              <View className="items-center py-2 bg-zinc-900/60 rounded-xl mb-3 border border-white/5">
+                <PeekRating
+                  defaultValue={5}
+                  count={5}
+                  size={26}
+                  activeColor="#10B981"
+                  idleColor="#3F3F46"
+                  tipColor="#064E3B"
+                  tipTextColor="#A7F3D0"
+                  labels={['Needs Work', 'Fair', 'Good', 'Very Good', 'Superb Host']}
+                  showTip={true}
+                  readOnly={false}
+                />
+              </View>
+
+              {/* Verified Owner Stats Row */}
+              <View className="flex-row justify-between border-t border-white/10 pt-3">
+                <View className="items-center flex-1">
+                  <Text className="text-[11px] text-zinc-400">Properties</Text>
+                  <Text className="font-heading text-sm text-white mt-0.5">3 Active</Text>
+                </View>
+                <View className="w-[1px] bg-white/10" />
+                <View className="items-center flex-1">
+                  <Text className="text-[11px] text-zinc-400">Response Rate</Text>
+                  <Text className="font-heading text-sm text-white mt-0.5">98%</Text>
+                </View>
+                <View className="w-[1px] bg-white/10" />
+                <View className="items-center flex-1">
+                  <Text className="text-[11px] text-zinc-400">Avg Time</Text>
+                  <Text className="font-heading text-sm text-white mt-0.5">&lt; 15 mins</Text>
+                </View>
               </View>
             </View>
-          </View>
+          </SpotlightCard>
         </View>
 
         {/* Menu Sections */}

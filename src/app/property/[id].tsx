@@ -1,10 +1,9 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
 import {
   ArrowLeft,
-  Heart,
   Share2,
   MapPin,
   ShieldCheck,
@@ -13,30 +12,23 @@ import {
 } from 'lucide-react-native';
 import { getDB, addFavorite, removeFavorite } from '@/api/mock/db';
 import { PriceTag } from '@/components/common/price-tag';
-import { Button } from '@/components/ui/button';
+import { PulseHeart } from '@/components/common/pulse-heart';
+import { BellToggle } from '@/components/common/bell-toggle';
+import { SlideCommit } from '@/components/common/slide-commit';
+import { PeekRating } from '@/components/common/peek-rating';
+import { SpotlightCard } from '@/components/common/spotlight-card';
 import { Image } from 'expo-image';
 import { toast } from '@/components/ui/toast';
 import { colors } from '@/theme/tokens';
 
 export default function PropertyDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const insets = useSafeAreaInsets();
   const db = getDB();
   const property = db.properties.find((p) => p.id === id) ?? db.properties[0]!;
   const owner = db.users.find((u) => u.id === property.ownerId);
 
   const [isFavorite, setIsFavorite] = React.useState(db.favorites.includes(property.id));
-
-  const toggleFavorite = () => {
-    if (isFavorite) {
-      removeFavorite(property.id);
-      setIsFavorite(false);
-      toast.info('Removed from saved properties');
-    } else {
-      addFavorite(property.id);
-      setIsFavorite(true);
-      toast.success('Saved to your favorites!');
-    }
-  };
 
   return (
     <View className="flex-1 bg-background">
@@ -52,17 +44,25 @@ export default function PropertyDetailScreen() {
           <ArrowLeft size={20} className="text-foreground" />
         </TouchableOpacity>
 
-        <View className="flex-row gap-2">
-          <TouchableOpacity
-            onPress={toggleFavorite}
-            className="h-10 w-10 items-center justify-center rounded-full bg-background/80 backdrop-blur-md"
-          >
-            <Heart
-              size={20}
-              color={isFavorite ? colors.destructive : colors.foreground}
-              fill={isFavorite ? colors.destructive : 'transparent'}
-            />
-          </TouchableOpacity>
+        <View className="flex-row items-center gap-2">
+          <PulseHeart
+            liked={isFavorite}
+            size={40}
+            corner={20}
+            likedColor="#EF4444"
+            pillColor="rgba(255, 255, 255, 0.88)"
+            onChange={(liked) => {
+              if (liked) {
+                addFavorite(property.id);
+                setIsFavorite(true);
+                toast.success('Saved to your favorites!');
+              } else {
+                removeFavorite(property.id);
+                setIsFavorite(false);
+                toast.info('Removed from saved properties');
+              }
+            }}
+          />
           <TouchableOpacity
             onPress={() => toast.info('Link copied to clipboard')}
             className="h-10 w-10 items-center justify-center rounded-full bg-background/80 backdrop-blur-md"
@@ -129,23 +129,74 @@ export default function PropertyDetailScreen() {
             </View>
           </View>
 
-          {/* Owner Trust Badge */}
-          <View className="mb-5 flex-row items-center rounded-xl border border-border bg-muted/40 p-4">
-            <View className="mr-3 h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-              <ShieldCheck size={24} color={colors.primary} />
-            </View>
-            <View className="flex-1">
-              <View className="flex-row items-center">
-                <Text className="mr-1.5 font-body-semibold text-body text-foreground">
-                  {owner?.displayName ?? 'Verified Owner'}
-                </Text>
-                <View className="py-0.2 rounded bg-success/15 px-1.5">
-                  <Text className="text-[10px] font-bold text-success">VERIFIED</Text>
+          {/* Owner Trust Badge with SpotlightCard */}
+          <View className="mb-5">
+            <SpotlightCard
+              theme="light"
+              spotlightColor="#10B981"
+              intensity={0.16}
+              spotlightSize={240}
+              radius={18}
+            >
+              <View className="flex-row items-center p-4">
+                <View className="mr-3 h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                  <ShieldCheck size={24} color={colors.primary} />
+                </View>
+                <View className="flex-1">
+                  <View className="flex-row items-center">
+                    <Text className="mr-1.5 font-body-semibold text-body text-foreground">
+                      {owner?.displayName ?? 'Verified Owner'}
+                    </Text>
+                    <View className="py-0.2 rounded bg-success/15 px-1.5">
+                      <Text className="text-[10px] font-bold text-success">VERIFIED</Text>
+                    </View>
+                  </View>
+                  <Text className="mt-0.5 font-body text-xs text-muted-foreground">
+                    Government KYC Verified • High response rate (98%)
+                  </Text>
                 </View>
               </View>
-              <Text className="mt-0.5 font-body text-xs text-muted-foreground">
-                Government KYC Verified • High response rate (98%)
+            </SpotlightCard>
+          </View>
+
+          {/* Availability Notifications with BellToggle */}
+          <View className="mb-5 flex-row items-center justify-between rounded-xl border border-border bg-card p-3.5">
+            <View className="flex-1 pr-3">
+              <Text className="font-body-semibold text-sm text-foreground">Room Availability Alert</Text>
+              <Text className="font-body text-xs text-muted-foreground">
+                Get instant notification if a vacancy opens
               </Text>
+            </View>
+            <BellToggle
+              size="sm"
+              offLabel="Notify me"
+              onLabel="Subscribed"
+              radius={16}
+              onBackground="#10B981"
+              onColor="#FFFFFF"
+              onChange={(active) => {
+                if (active) toast.success('Subscribed to room vacancy alerts!');
+                else toast.info('Alerts unsubscribed');
+              }}
+            />
+          </View>
+
+          {/* Student Reviews with PeekRating */}
+          <View className="mb-5 rounded-xl border border-border bg-card p-4">
+            <View className="flex-row items-center justify-between mb-2">
+              <Text className="font-heading text-sm text-foreground">Student Rating</Text>
+              <Text className="font-body-semibold text-xs text-foreground">★ {property.rating} ({property.reviewCount} reviews)</Text>
+            </View>
+            <View className="items-center py-2 bg-muted/40 rounded-lg">
+              <PeekRating
+                value={Math.round(property.rating)}
+                count={5}
+                size={24}
+                readOnly={true}
+                showTip={false}
+                activeColor="#F59E0B"
+                idleColor="#9CA3AF"
+              />
             </View>
           </View>
 
@@ -182,8 +233,11 @@ export default function PropertyDetailScreen() {
         </View>
       </ScrollView>
 
-      {/* Sticky Bottom CTA Bar */}
-      <View className="shadow-elevation-2 absolute bottom-0 left-0 right-0 flex-row items-center gap-3 border-t border-border bg-card p-4">
+      {/* Sticky Bottom CTA Bar with SlideCommit */}
+      <View
+        style={{ paddingBottom: Math.max(14, insets.bottom), paddingTop: 12 }}
+        className="shadow-elevation-2 absolute bottom-0 left-0 right-0 flex-row items-center gap-3 border-t border-border bg-card px-4"
+      >
         <TouchableOpacity
           onPress={() => router.push(`/chat/inquiry-1`)}
           className="h-12 w-12 items-center justify-center rounded-xl border border-border bg-muted/50"
@@ -192,20 +246,23 @@ export default function PropertyDetailScreen() {
           <MessageSquare size={20} className="text-foreground" />
         </TouchableOpacity>
 
-        <TouchableOpacity
-          onPress={() => toast.info('Tour booking opens in Phase M3')}
-          className="flex-1 items-center justify-center rounded-xl border border-border bg-muted/60 py-3.5"
-        >
-          <Text className="font-body-semibold text-xs text-foreground">Request Tour</Text>
-        </TouchableOpacity>
-
-        <Button
-          onPress={() => toast.success('Application flow launches in Transact Phase')}
-          size="default"
-          className="flex-1 py-3.5"
-        >
-          <Text className="font-body-semibold text-xs text-primary-foreground">Apply to Book</Text>
-        </Button>
+        <View className="flex-1">
+          <SlideCommit
+            label="Slide to Apply"
+            doneLabel="Application Sent!"
+            errorLabel="Failed to apply"
+            height={50}
+            radius={25}
+            trackColor="#111827"
+            handleColor="#FFFFFF"
+            successColor="#10B981"
+            onConfirm={async () => {
+              // Simulate booking application submission
+              await new Promise((res) => setTimeout(res, 600));
+              toast.success('Your booking request was submitted to the owner!');
+            }}
+          />
+        </View>
       </View>
     </View>
   );

@@ -3,6 +3,12 @@ import { Tabs } from 'expo-router';
 import { Search, Heart, CalendarClock, MessageSquare, User } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { colors } from '@/theme/tokens';
+import {
+  GlassTabBarBackground,
+  floatingTabBarStyle,
+  GlassTabButton,
+  GlassTabIcon,
+} from '@/components/common/glass-tab-bar';
 
 export default function StudentTabsLayout() {
   const { t } = useTranslation();
@@ -12,18 +18,15 @@ export default function StudentTabsLayout() {
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.mutedForeground,
-        tabBarStyle: {
-          backgroundColor: colors.card,
-          borderTopColor: colors.border,
-          borderTopWidth: 1,
-          height: 60,
-          paddingBottom: 8,
-          paddingTop: 6,
-        },
+        tabBarInactiveTintColor: '#9CA3AF',
+        tabBarHideOnKeyboard: true,
+        tabBarStyle: floatingTabBarStyle,
+        tabBarBackground: () => <GlassTabBarBackground />,
+        tabBarButton: (props) => <GlassTabButton {...props} />,
         tabBarLabelStyle: {
-          fontFamily: 'Inter_500Medium',
-          fontSize: 11,
+          fontFamily: 'Inter_600SemiBold',
+          fontSize: 10,
+          marginTop: 1,
         },
       }}
     >
@@ -31,35 +34,65 @@ export default function StudentTabsLayout() {
         name="explore"
         options={{
           title: t('tabs.explore'),
-          tabBarIcon: ({ color, size }) => <Search size={size} color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <GlassTabIcon
+              icon={<Search size={20} color={color} strokeWidth={focused ? 2.4 : 2} />}
+              focused={focused}
+              accentColor={colors.primary}
+            />
+          ),
         }}
       />
       <Tabs.Screen
         name="saved"
         options={{
           title: t('tabs.saved'),
-          tabBarIcon: ({ color, size }) => <Heart size={size} color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <GlassTabIcon
+              icon={<Heart size={20} color={color} strokeWidth={focused ? 2.4 : 2} />}
+              focused={focused}
+              accentColor={colors.primary}
+            />
+          ),
         }}
       />
       <Tabs.Screen
         name="activity"
         options={{
           title: t('tabs.activity'),
-          tabBarIcon: ({ color, size }) => <CalendarClock size={size} color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <GlassTabIcon
+              icon={<CalendarClock size={20} color={color} strokeWidth={focused ? 2.4 : 2} />}
+              focused={focused}
+              accentColor={colors.primary}
+            />
+          ),
         }}
       />
       <Tabs.Screen
         name="inbox"
         options={{
           title: t('tabs.inbox'),
-          tabBarIcon: ({ color, size }) => <MessageSquare size={size} color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <GlassTabIcon
+              icon={<MessageSquare size={20} color={color} strokeWidth={focused ? 2.4 : 2} />}
+              focused={focused}
+              accentColor={colors.primary}
+            />
+          ),
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: t('tabs.profile'),
-          tabBarIcon: ({ color, size }) => <User size={size} color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <GlassTabIcon
+              icon={<User size={20} color={color} strokeWidth={focused ? 2.4 : 2} />}
+              focused={focused}
+              accentColor={colors.primary}
+            />
+          ),
         }}
       />
     </Tabs>

@@ -1,17 +1,6 @@
 import React from 'react';
-import { Redirect } from 'expo-router';
-import { useSessionStore } from '@/stores/session';
+import { StartupScreen } from '@/features/auth/screens/startup-screen';
 
 export default function Index() {
-  const { isAuthenticated, role } = useSessionStore();
-
-  if (!isAuthenticated) {
-    return <Redirect href="/(auth)" />;
-  }
-
-  if (role === 'owner') {
-    return <Redirect href="/(owner)/(tabs)/dashboard" />;
-  }
-
-  return <Redirect href="/(student)/(tabs)/explore" />;
+  return <StartupScreen />;
 }

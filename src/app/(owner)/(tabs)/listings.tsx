@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Plus, Building2, MapPin } from 'lucide-react-native';
@@ -7,8 +7,8 @@ import { getDB, MockProperty } from '@/api/mock/db';
 import { StatusPill } from '@/components/common/status-pill';
 import { PriceTag } from '@/components/common/price-tag';
 import { EmptyState } from '@/components/common/empty-state';
+import { TiltedCard } from '@/components/common/tilted-card';
 import { Button } from '@/components/ui/button';
-import { Image } from 'expo-image';
 import { useTranslation } from 'react-i18next';
 
 export default function OwnerListingsScreen() {
@@ -47,33 +47,29 @@ export default function OwnerListingsScreen() {
       ) : (
         <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
+          contentContainerStyle={{ padding: 16, paddingBottom: 110 }}
         >
           <View className="gap-4">
-            {listings.map((property: MockProperty) => (
-              <TouchableOpacity
+            {listings.map((property: MockProperty, idx: number) => (
+              <TiltedCard
                 key={property.id}
-                onPress={() => router.push(`/property/${property.id}`)}
-                className="shadow-elevation-1 overflow-hidden rounded-xl border border-border bg-card"
-                activeOpacity={0.8}
+                imageSrc={property.images[0]}
+                captionText={`Status: ${property.status}`}
+                imageHeight={160}
+                radius={16}
+                rotateAmplitude={12}
+                index={idx}
+                onClick={() => router.push(`/property/${property.id}`)}
               >
-                <View className="relative h-36 w-full bg-muted">
-                  <Image
-                    source={{ uri: property.images[0] }}
-                    style={{ width: '100%', height: '100%' }}
-                    contentFit="cover"
-                  />
-                  <View className="absolute left-3 top-3">
-                    <StatusPill status={property.status} />
-                  </View>
-                </View>
-
-                <View className="p-3.5">
+                <View className="p-3.5 bg-card">
                   <View className="mb-1 flex-row items-center justify-between">
                     <PriceTag paise={property.rentPaise} size="sm" />
-                    <Text className="font-body-medium text-xs capitalize text-muted-foreground">
-                      {property.roomType.replace('_', ' ')}
-                    </Text>
+                    <View className="flex-row items-center gap-1.5">
+                      <StatusPill status={property.status} />
+                      <Text className="font-body-medium text-xs capitalize text-muted-foreground">
+                        {property.roomType.replace('_', ' ')}
+                      </Text>
+                    </View>
                   </View>
 
                   <Text
@@ -90,7 +86,7 @@ export default function OwnerListingsScreen() {
                     </Text>
                   </View>
                 </View>
-              </TouchableOpacity>
+              </TiltedCard>
             ))}
           </View>
         </ScrollView>

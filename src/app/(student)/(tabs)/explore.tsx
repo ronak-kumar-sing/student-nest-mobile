@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { Search, SlidersHorizontal, MapPin, Heart, Wrench, Users } from 'lucide-react-native';
+import { Search, SlidersHorizontal, MapPin, Wrench, Users } from 'lucide-react-native';
 import { getDB, MockProperty } from '@/api/mock/db';
 import { PriceTag } from '@/components/common/price-tag';
+import { TiltedCard } from '@/components/common/tilted-card';
 import { Chip } from '@/components/ui/chip';
-import { Image } from 'expo-image';
 import { colors } from '@/theme/tokens';
 
 export default function ExploreScreen() {
@@ -83,7 +83,7 @@ export default function ExploreScreen() {
       {/* Property List */}
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
+        contentContainerStyle={{ padding: 16, paddingBottom: 110 }}
       >
         <View className="mb-4 flex-row items-center justify-between">
           <Text className="font-body-semibold text-sm text-foreground">
@@ -99,45 +99,24 @@ export default function ExploreScreen() {
         </View>
 
         <View className="gap-4">
-          {filteredProperties.slice(0, 15).map((property: MockProperty) => (
-            <TouchableOpacity
+          {filteredProperties.slice(0, 15).map((property: MockProperty, idx: number) => (
+            <TiltedCard
               key={property.id}
-              onPress={() => router.push(`/property/${property.id}`)}
-              className="shadow-elevation-1 overflow-hidden rounded-xl border border-border bg-card"
-              activeOpacity={0.8}
+              imageSrc={property.images[0]}
+              captionText={`★ ${property.rating} (${property.reviewCount})`}
+              imageHeight={185}
+              radius={18}
+              rotateAmplitude={14}
+              index={idx}
+              onClick={() => router.push(`/property/${property.id}`)}
             >
-              {/* Cover Image */}
-              <View className="relative h-44 w-full bg-muted">
-                <Image
-                  source={{ uri: property.images[0] }}
-                  style={{ width: '100%', height: '100%' }}
-                  contentFit="cover"
-                  transition={200}
-                />
-                <TouchableOpacity
-                  className="absolute right-3 top-3 h-8 w-8 items-center justify-center rounded-full bg-background/80 backdrop-blur-md"
-                  accessibilityLabel="Save property"
-                >
-                  <Heart size={16} color={colors.foreground} />
-                </TouchableOpacity>
-
-                <View className="absolute bottom-3 left-3 rounded-md bg-background/90 px-2.5 py-1 backdrop-blur-md">
-                  <Text className="font-body-semibold text-xs capitalize text-foreground">
-                    {property.roomType.replace('_', ' ')}
-                  </Text>
-                </View>
-              </View>
-
               {/* Info Block */}
-              <View className="p-3.5">
+              <View className="p-3.5 bg-card">
                 <View className="mb-1 flex-row items-center justify-between">
                   <PriceTag paise={property.rentPaise} size="default" />
-                  <View className="flex-row items-center rounded bg-muted px-2 py-0.5">
-                    <Text className="font-body-semibold text-xs text-foreground">
-                      ★ {property.rating}
-                    </Text>
-                    <Text className="ml-1 font-body text-xs text-muted-foreground">
-                      ({property.reviewCount})
+                  <View className="rounded-full bg-primary/10 px-2.5 py-0.5">
+                    <Text className="font-body-semibold text-[11px] capitalize text-primary">
+                      {property.roomType.replace('_', ' ')}
                     </Text>
                   </View>
                 </View>
@@ -170,7 +149,7 @@ export default function ExploreScreen() {
                   )}
                 </View>
               </View>
-            </TouchableOpacity>
+            </TiltedCard>
           ))}
         </View>
       </ScrollView>

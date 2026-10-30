@@ -7,8 +7,8 @@ import { getDB } from '@/api/mock/db';
 import { StatusPill } from '@/components/common/status-pill';
 import { PriceTag } from '@/components/common/price-tag';
 import { EmptyState } from '@/components/common/empty-state';
+import { RubberSegment } from '@/components/common/rubber-segment';
 import { formatIST } from '@/lib/dates';
-import { cn } from '@/lib/cn';
 import { useTranslation } from 'react-i18next';
 import { colors } from '@/theme/tokens';
 
@@ -26,46 +26,28 @@ export default function ActivityScreen() {
         <Text className="font-heading text-h2 text-foreground">{t('tabs.activity')}</Text>
 
         {/* Segmented Control */}
-        <View className="mt-3 flex-row rounded-xl bg-muted p-1">
-          <TouchableOpacity
-            onPress={() => setActiveTab('bookings')}
-            className={cn(
-              'flex-1 items-center rounded-lg py-2',
-              activeTab === 'bookings' ? 'shadow-elevation-1 bg-card' : 'bg-transparent',
-            )}
-          >
-            <Text
-              className={cn(
-                'font-body-semibold text-xs',
-                activeTab === 'bookings' ? 'text-foreground' : 'text-muted-foreground',
-              )}
-            >
-              Bookings ({bookings.length})
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => setActiveTab('tours')}
-            className={cn(
-              'flex-1 items-center rounded-lg py-2',
-              activeTab === 'tours' ? 'shadow-elevation-1 bg-card' : 'bg-transparent',
-            )}
-          >
-            <Text
-              className={cn(
-                'font-body-semibold text-xs',
-                activeTab === 'tours' ? 'text-foreground' : 'text-muted-foreground',
-              )}
-            >
-              Tours ({tours.length})
-            </Text>
-          </TouchableOpacity>
+        {/* Dynamic RubberSegment for Smooth Tab Switching */}
+        <View className="mt-3">
+          <RubberSegment
+            items={[
+              { value: 'bookings', label: `Bookings (${bookings.length})` },
+              { value: 'tours', label: `Tours (${tours.length})` },
+            ]}
+            value={activeTab}
+            onChange={(val) => setActiveTab(val as 'bookings' | 'tours')}
+            trackColor="#F3F4F6"
+            thumbColor="#FFFFFF"
+            textColor="#6B7280"
+            activeTextColor="#111827"
+            size="md"
+            radius={12}
+          />
         </View>
       </View>
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
+        contentContainerStyle={{ padding: 16, paddingBottom: 110 }}
       >
         {activeTab === 'bookings' ? (
           bookings.length === 0 ? (

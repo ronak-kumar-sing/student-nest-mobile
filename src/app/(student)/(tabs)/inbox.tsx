@@ -5,6 +5,7 @@ import { router } from 'expo-router';
 import { MessageSquare, Bell, ChevronRight } from 'lucide-react-native';
 import { getDB } from '@/api/mock/db';
 import { EmptyState } from '@/components/common/empty-state';
+import { RubberSegment } from '@/components/common/rubber-segment';
 import { formatRelativeIST } from '@/lib/dates';
 import { cn } from '@/lib/cn';
 import { useTranslation } from 'react-i18next';
@@ -24,53 +25,28 @@ export default function InboxScreen() {
         <Text className="font-heading text-h2 text-foreground">{t('tabs.inbox')}</Text>
 
         {/* Segmented Control */}
-        <View className="mt-3 flex-row rounded-xl bg-muted p-1">
-          <TouchableOpacity
-            onPress={() => setActiveTab('messages')}
-            className={cn(
-              'flex-1 items-center rounded-lg py-2',
-              activeTab === 'messages' ? 'shadow-elevation-1 bg-card' : 'bg-transparent',
-            )}
-          >
-            <Text
-              className={cn(
-                'font-body-semibold text-xs',
-                activeTab === 'messages' ? 'text-foreground' : 'text-muted-foreground',
-              )}
-            >
-              Messages ({inquiries.length})
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => setActiveTab('notifications')}
-            className={cn(
-              'flex-1 flex-row items-center justify-center rounded-lg py-2',
-              activeTab === 'notifications' ? 'shadow-elevation-1 bg-card' : 'bg-transparent',
-            )}
-          >
-            <Text
-              className={cn(
-                'mr-1.5 font-body-semibold text-xs',
-                activeTab === 'notifications' ? 'text-foreground' : 'text-muted-foreground',
-              )}
-            >
-              Notifications
-            </Text>
-            {unreadNotifs > 0 && (
-              <View className="py-0.2 rounded-full bg-destructive px-1.5">
-                <Text className="text-[10px] font-bold text-destructive-foreground">
-                  {unreadNotifs}
-                </Text>
-              </View>
-            )}
-          </TouchableOpacity>
+        {/* Dynamic RubberSegment for Inbox Switching */}
+        <View className="mt-3">
+          <RubberSegment
+            items={[
+              { value: 'messages', label: `Messages (${inquiries.length})` },
+              { value: 'notifications', label: unreadNotifs > 0 ? `Notifications (${unreadNotifs})` : 'Notifications' },
+            ]}
+            value={activeTab}
+            onChange={(val) => setActiveTab(val as 'messages' | 'notifications')}
+            trackColor="#F3F4F6"
+            thumbColor="#FFFFFF"
+            textColor="#6B7280"
+            activeTextColor="#111827"
+            size="md"
+            radius={12}
+          />
         </View>
       </View>
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
+        contentContainerStyle={{ padding: 16, paddingBottom: 110 }}
       >
         {activeTab === 'messages' ? (
           inquiries.length === 0 ? (
