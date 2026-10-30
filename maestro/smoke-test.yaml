@@ -14,3 +14,4 @@ appId: com.studentnest.app.dev
 - assertVisible: "Inbox"
 - tapOn: "Profile"
 - assertVisible: "Profile"
+

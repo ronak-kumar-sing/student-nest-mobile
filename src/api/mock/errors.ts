@@ -42,3 +42,4 @@ export function createMockError(statusCode: number, code: string, message?: stri
     statusCode,
   });
 }
+

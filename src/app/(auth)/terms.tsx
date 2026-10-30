@@ -54,3 +54,4 @@ export default function TermsScreen() {
     </SafeAreaView>
   );
 }
+

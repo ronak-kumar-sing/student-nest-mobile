@@ -30,3 +30,4 @@ export const toast = {
     sonnerToast(message, { description });
   },
 };
+

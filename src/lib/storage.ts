@@ -6,18 +6,63 @@
  * - TanStack Query async storage persister
  * - General app preferences
  *
+ * Falls back to an in-memory storage if native MMKV / NitroModules
+ * is not linked or running in an environment without native modules (e.g. Expo Go).
+ *
  * Sensitive data (tokens, secrets) must use `expo-secure-store` instead.
  */
 
-import { createMMKV } from 'react-native-mmkv';
+export interface StorageAdapter {
+  getString(key: string): string | undefined;
+  set(key: string, value: string | boolean | number): void;
+  remove(key: string): boolean;
+  getAllKeys(): string[];
+  clearAll(): void;
+}
 
-/** Shared MMKV instance used across the app */
-export const storage = createMMKV({
-  id: 'student-nest-storage',
-});
+class InMemoryStorage implements StorageAdapter {
+  private store = new Map<string, string>();
+
+  getString(key: string): string | undefined {
+    return this.store.get(key);
+  }
+
+  set(key: string, value: string | boolean | number): void {
+    this.store.set(key, String(value));
+  }
+
+  remove(key: string): boolean {
+    return this.store.delete(key);
+  }
+
+  getAllKeys(): string[] {
+    return Array.from(this.store.keys());
+  }
+
+  clearAll(): void {
+    this.store.clear();
+  }
+}
+
+function initStorage(): StorageAdapter {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { createMMKV } = require('react-native-mmkv');
+    return createMMKV({ id: 'student-nest-storage' });
+  } catch {
+    if (__DEV__) {
+      console.warn(
+        '[Storage] Native MMKV/NitroModules not found in current runtime. Falling back to in-memory storage. Note: Rebuild your dev client (npx expo run:android) to enable persistent MMKV storage.',
+      );
+    }
+    return new InMemoryStorage();
+  }
+}
+
+export const storage = initStorage();
 
 /**
- * Get a string value from MMKV storage.
+ * Get a string value from storage.
  * Returns `null` if the key does not exist.
  */
 export function getItem(key: string): string | null {
@@ -25,21 +70,21 @@ export function getItem(key: string): string | null {
 }
 
 /**
- * Set a string value in MMKV storage.
+ * Set a string value in storage.
  */
 export function setItem(key: string, value: string): void {
   storage.set(key, value);
 }
 
 /**
- * Remove a key from MMKV storage.
+ * Remove a key from storage.
  */
 export function removeItem(key: string): void {
   storage.remove(key);
 }
 
 /**
- * Get all keys currently stored in MMKV.
+ * Get all keys currently stored.
  */
 export function getAllKeys(): string[] {
   return storage.getAllKeys();
@@ -57,7 +102,7 @@ export const zustandStorage = {
 
 /**
  * TanStack Query async storage persister adapter.
- * Wraps MMKV with the async interface expected by `@tanstack/query-async-storage-persister`.
+ * Wraps storage with the async interface expected by `@tanstack/query-async-storage-persister`.
  */
 export const queryClientStorage = {
   getItem: (key: string): string | null => getItem(key),

@@ -5,3 +5,4 @@ import InboxScreen from '@/app/(student)/(tabs)/inbox';
 export default function OwnerInboxScreen() {
   return <InboxScreen />;
 }
+

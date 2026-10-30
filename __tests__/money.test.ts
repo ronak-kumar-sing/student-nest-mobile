@@ -21,3 +21,4 @@ describe('Money utilities (paise conventions)', () => {
     expect(rupeesToPaise(4999.5)).toBe(499950);
   });
 });
+

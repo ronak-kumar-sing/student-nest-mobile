@@ -38,3 +38,4 @@ export function PriceTag({ paise, period = '/month', size = 'default', className
     </View>
   );
 }
+
