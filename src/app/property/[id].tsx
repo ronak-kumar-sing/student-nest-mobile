@@ -257,8 +257,29 @@ export default function PropertyDetailScreen() {
             handleColor="#FFFFFF"
             successColor="#10B981"
             onConfirm={async () => {
-              // Simulate booking application submission
-              await new Promise((res) => setTimeout(res, 600));
+              await new Promise((res) => setTimeout(res, 450));
+              const database = getDB();
+              const newBooking = {
+                id: `booking-${Date.now()}`,
+                propertyId: property.id,
+                studentId: 'student-1',
+                ownerId: property.ownerId,
+                status: 'pending' as const,
+                moveInDate: new Date(Date.now() + 7 * 86400000).toISOString(),
+                durationMonths: 6,
+                occupants: 1,
+                agreedRentPaise: property.rentPaise,
+                createdAt: new Date().toISOString(),
+                history: [
+                  {
+                    status: 'pending',
+                    at: new Date().toISOString(),
+                    by: 'student-1',
+                    note: 'Applied directly through verified listing',
+                  },
+                ],
+              };
+              database.bookings.unshift(newBooking);
               toast.success('Your booking request was submitted to the owner!');
             }}
           />

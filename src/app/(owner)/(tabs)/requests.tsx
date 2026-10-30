@@ -10,16 +10,22 @@ import { RubberSegment } from '@/components/common/rubber-segment';
 import { formatIST } from '@/lib/dates';
 import { useTranslation } from 'react-i18next';
 import { toast } from '@/components/ui/toast';
+import { useOwnerStore } from '@/stores/owner-store';
+import { mediumImpact, lightImpact } from '@/lib/haptics';
 
 export default function OwnerRequestsScreen() {
   const { t } = useTranslation();
   const db = getDB();
   const [activeTab, setActiveTab] = useState<'bookings' | 'tours'>('bookings');
-
-  const incomingBookings = db.bookings.filter((b) => b.ownerId === 'owner-1');
-  const incomingTours = db.tours.filter((t) => t.ownerId === 'owner-1');
+  const [bookingsList, setBookingsList] = useState(
+    db.bookings.filter((b) => b.ownerId === 'owner-1')
+  );
+  const [toursList] = useState(
+    db.tours.filter((t) => t.ownerId === 'owner-1')
+  );
 
   const handleApprove = (bookingId: string) => {
+    mediumImpact();
     const booking = db.bookings.find((b) => b.id === bookingId);
     if (booking) {
       booking.status = 'approved';
@@ -29,11 +35,27 @@ export default function OwnerRequestsScreen() {
         by: 'owner-1',
         note: 'Approved by owner',
       });
-      toast.success('Booking application approved! Tenant notified.');
+
+      const student = db.users.find((u) => u.id === booking.studentId);
+      const property = db.properties.find((p) => p.id === booking.propertyId);
+
+      // Record financial credit into owner store
+      useOwnerStore
+        .getState()
+        .recordBookingApproval(
+          student?.displayName || 'Student Resident',
+          property?.title || 'Nest Room',
+          booking.agreedRentPaise,
+          booking.agreedRentPaise * 2
+        );
+
+      setBookingsList([...db.bookings.filter((b) => b.ownerId === 'owner-1')]);
+      toast.success('Booking application approved! Tenant notified & revenue recorded.');
     }
   };
 
   const handleReject = (bookingId: string) => {
+    lightImpact();
     const booking = db.bookings.find((b) => b.id === bookingId);
     if (booking) {
       booking.status = 'rejected';
@@ -42,6 +64,7 @@ export default function OwnerRequestsScreen() {
         at: new Date().toISOString(),
         by: 'owner-1',
       });
+      setBookingsList([...db.bookings.filter((b) => b.ownerId === 'owner-1')]);
       toast.info('Booking application rejected.');
     }
   };
@@ -55,8 +78,8 @@ export default function OwnerRequestsScreen() {
         <View className="mt-3">
           <RubberSegment
             items={[
-              { value: 'bookings', label: `Applications (${incomingBookings.length})` },
-              { value: 'tours', label: `Tours (${incomingTours.length})` },
+              { value: 'bookings', label: `Applications (${bookingsList.length})` },
+              { value: 'tours', label: `Tours (${toursList.length})` },
             ]}
             value={activeTab}
             onChange={(val) => setActiveTab(val as 'bookings' | 'tours')}
@@ -75,7 +98,7 @@ export default function OwnerRequestsScreen() {
         contentContainerStyle={{ padding: 16, paddingBottom: 110 }}
       >
         {activeTab === 'bookings' ? (
-          incomingBookings.length === 0 ? (
+          bookingsList.length === 0 ? (
             <EmptyState
               title="No pending booking applications"
               description="When verified students apply for your rooms, review their move-in details and approve them here."
@@ -83,7 +106,7 @@ export default function OwnerRequestsScreen() {
             />
           ) : (
             <View className="gap-3">
-              {incomingBookings.map((booking) => {
+              {bookingsList.map((booking) => {
                 const property = db.properties.find((p) => p.id === booking.propertyId);
                 const student = db.users.find((u) => u.id === booking.studentId);
 
@@ -154,7 +177,7 @@ export default function OwnerRequestsScreen() {
               })}
             </View>
           )
-        ) : incomingTours.length === 0 ? (
+        ) : toursList.length === 0 ? (
           <EmptyState
             title="No tour requests"
             description="Students interested in visiting your properties will request slots here."
@@ -162,7 +185,7 @@ export default function OwnerRequestsScreen() {
           />
         ) : (
           <View className="gap-3">
-            {incomingTours.map((tour) => {
+            {toursList.map((tour) => {
               const property = db.properties.find((p) => p.id === tour.propertyId);
               return (
                 <View

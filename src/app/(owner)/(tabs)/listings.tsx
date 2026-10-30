@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { Plus, Building2, MapPin } from 'lucide-react-native';
 import { getDB, MockProperty } from '@/api/mock/db';
 import { StatusPill } from '@/components/common/status-pill';
@@ -13,8 +13,14 @@ import { useTranslation } from 'react-i18next';
 
 export default function OwnerListingsScreen() {
   const { t } = useTranslation();
-  const db = getDB();
-  const listings = db.properties.filter((p) => p.ownerId === 'owner-1');
+  const [listings, setListings] = useState<MockProperty[]>([]);
+
+  useFocusEffect(
+    useCallback(() => {
+      const db = getDB();
+      setListings(db.properties.filter((p) => p.ownerId === 'owner-1'));
+    }, [])
+  );
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>

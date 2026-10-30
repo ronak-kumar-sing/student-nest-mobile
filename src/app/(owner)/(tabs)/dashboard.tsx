@@ -7,6 +7,11 @@ import {
   StyleSheet,
   Dimensions,
   ImageStyle,
+  Modal,
+  TextInput,
+  TouchableWithoutFeedback,
+  Keyboard,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -24,12 +29,20 @@ import {
   ShoppingBag,
   Send,
   MoreVertical,
+  X,
+  CheckCircle2,
+  Download,
+  MessageSquare,
+  ShieldCheck,
+  Building,
 } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import { RubberSegment } from '@/components/common/rubber-segment';
-import { formatINR } from '@/lib/money';
+import { formatINR, rupeesToPaise, paiseToRupees } from '@/lib/money';
 import { toast } from '@/components/ui/toast';
-import { selectionFeedback } from '@/lib/haptics';
+import { selectionFeedback, mediumImpact, lightImpact } from '@/lib/haptics';
+import { useOwnerStore, OwnerTransaction } from '@/stores/owner-store';
+import { formatIST } from '@/lib/dates';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -110,7 +123,7 @@ function ProfitsDonutChart({
     <View style={donutStyles.container}>
       <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
         <G rotation="-90" origin={`${size / 2}, ${size / 2}`}>
-          {/* Lavender Arc (Direct Bookings) */}
+          {/* Lavender Arc (Direct Student Bookings 60%) */}
           <Circle
             cx={size / 2}
             cy={size / 2}
@@ -122,7 +135,7 @@ function ProfitsDonutChart({
             fill="transparent"
           />
 
-          {/* Yellow Arc (Affiliate Portals) */}
+          {/* Yellow Arc (Campus Portals & Deposits 24%) */}
           <Circle
             cx={size / 2}
             cy={size / 2}
@@ -134,7 +147,7 @@ function ProfitsDonutChart({
             fill="transparent"
           />
 
-          {/* Sage Green Arc (Offline Sales) */}
+          {/* Sage Green Arc (Walk-in & Offline 16%) */}
           <Circle
             cx={size / 2}
             cy={size / 2}
@@ -222,6 +235,26 @@ export default function OwnerDashboardScreen() {
   const [activeTab, setActiveTab] = useState<'analytics' | 'profits' | 'wallet'>('analytics');
   const [selectedDayIndex, setSelectedDayIndex] = useState(2); // Wednesday (matches screenshot)
 
+  // Owner Store State
+  const {
+    balancePaise,
+    earnedPaise,
+    spentPaise,
+    cashbackPaise,
+    weeklySalesPaise,
+    selectedTimeFilter,
+    payoutBank,
+    transactions,
+    withdrawPayout,
+    setTimeFilter,
+  } = useOwnerStore();
+
+  // Modals
+  const [isPayoutModalVisible, setIsPayoutModalVisible] = useState(false);
+  const [payoutInput, setPayoutInput] = useState('');
+  const [selectedTx, setSelectedTx] = useState<OwnerTransaction | null>(null);
+  const [isFilterPickerVisible, setIsFilterPickerVisible] = useState(false);
+
   const weeklyData = [
     { day: 'Mon', heightPct: 0.35, paise: 1425000 },
     { day: 'Tue', heightPct: 0.65, paise: 2610000 },
@@ -231,6 +264,37 @@ export default function OwnerDashboardScreen() {
     { day: 'Sat', heightPct: 0.72, paise: 2895000 },
     { day: 'Sun', heightPct: 0.46, paise: 1830000 },
   ];
+
+  const handleWithdrawConfirm = () => {
+    mediumImpact();
+    const rupees = parseInt(payoutInput, 10);
+    if (isNaN(rupees) || rupees <= 0) {
+      toast.error('Please enter a valid amount');
+      return;
+    }
+
+    const amountPaise = rupeesToPaise(rupees);
+    if (amountPaise > balancePaise) {
+      toast.error('Amount exceeds your available balance');
+      return;
+    }
+
+    const res = withdrawPayout(amountPaise);
+    if (res.success) {
+      setIsPayoutModalVisible(false);
+      setPayoutInput('');
+      toast.success(
+        `₹${rupees.toLocaleString('en-IN')} transferred to ${payoutBank.bankName} (${payoutBank.accountNumberMasked}) via instant IMPS.`
+      );
+    } else {
+      toast.error(res.message);
+    }
+  };
+
+  const handleExportStatement = () => {
+    mediumImpact();
+    toast.success('Rental statement for October 2026 exported to PDF!');
+  };
 
   return (
     <SafeAreaView
@@ -340,7 +404,7 @@ export default function OwnerDashboardScreen() {
               </View>
 
               {/* Big Figure */}
-              <Text style={styles.bigSalesNumber}>₹ 24,575</Text>
+              <Text style={styles.bigSalesNumber}>{formatINR(weeklySalesPaise)}</Text>
 
               {/* Sparkline Curve */}
               <View style={styles.sparklineWrap}>
@@ -355,7 +419,10 @@ export default function OwnerDashboardScreen() {
                   <Text style={styles.chartSectionTitle}>User in The Last Week</Text>
                   <Text style={styles.chartBigPct}>+ 3,2%</Text>
                 </View>
-                <TouchableOpacity onPress={() => toast.info('Detailed student analytics opens in M6')}>
+                <TouchableOpacity
+                  onPress={() => router.push('/(owner)/(tabs)/requests')}
+                  activeOpacity={0.7}
+                >
                   <Text style={styles.seeAllText}>See all</Text>
                 </TouchableOpacity>
               </View>
@@ -427,52 +494,51 @@ export default function OwnerDashboardScreen() {
                 <Text style={styles.lastOrdersTitle}>Last Orders</Text>
 
                 <TouchableOpacity
-                  onPress={() => toast.info('Filter: Every 3 Hours')}
+                  onPress={() => {
+                    lightImpact();
+                    setIsFilterPickerVisible(true);
+                  }}
                   style={styles.timeDropdownPill}
                   activeOpacity={0.8}
                 >
-                  <Text style={styles.timeDropdownText}>Every 3 Hours</Text>
+                  <Text style={styles.timeDropdownText}>{selectedTimeFilter}</Text>
                   <ChevronDown size={13} color="#4B5563" />
                 </TouchableOpacity>
               </View>
 
               {/* Order Rows */}
               <View style={styles.orderRowsWrap}>
-                {/* Order 1: David Astee */}
-                <View style={styles.orderRow}>
-                  <Image
-                    source={{ uri: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100' }}
-                    style={orderAvatarStyle}
-                  />
-                  <Text style={styles.orderName}>David Astee</Text>
-                  <Text style={styles.orderAmount}>₹ 1,456</Text>
-                  <View style={[styles.statusSquare, { backgroundColor: '#9FA8FF' }]} />
-                  <Text style={styles.orderDate}>11 Sep 2026</Text>
-                </View>
-
-                {/* Order 2: Maria Hulama */}
-                <View style={styles.orderRow}>
-                  <Image
-                    source={{ uri: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100' }}
-                    style={orderAvatarStyle}
-                  />
-                  <Text style={styles.orderName}>Maria Hulama</Text>
-                  <Text style={styles.orderAmount}>₹ 42,478</Text>
-                  <View style={[styles.statusSquare, { backgroundColor: '#CDE2B8' }]} />
-                  <Text style={styles.orderDate}>11 Sep 2026</Text>
-                </View>
-
-                {/* Order 3: Arnold Swarz */}
-                <View style={styles.orderRow}>
-                  <Image
-                    source={{ uri: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100' }}
-                    style={orderAvatarStyle}
-                  />
-                  <Text style={styles.orderName}>Arnold Swarz</Text>
-                  <Text style={styles.orderAmount}>₹ 3,412</Text>
-                  <View style={[styles.statusSquare, { backgroundColor: '#FDE68A' }]} />
-                  <Text style={styles.orderDate}>11 Sep 2026</Text>
-                </View>
+                {transactions.slice(0, 3).map((tx) => (
+                  <TouchableOpacity
+                    key={tx.id}
+                    onPress={() => {
+                      lightImpact();
+                      setSelectedTx(tx);
+                    }}
+                    style={styles.orderRow}
+                    activeOpacity={0.7}
+                  >
+                    <Image
+                      source={{
+                        uri:
+                          tx.tenantAvatar ||
+                          'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100',
+                      }}
+                      style={orderAvatarStyle}
+                    />
+                    <Text style={styles.orderName} numberOfLines={1}>
+                      {tx.tenantName || tx.title}
+                    </Text>
+                    <Text style={styles.orderAmount}>{formatINR(tx.amountPaise)}</Text>
+                    <View
+                      style={[
+                        styles.statusSquare,
+                        { backgroundColor: tx.statusSquareColor || '#9FA8FF' },
+                      ]}
+                    />
+                    <Text style={styles.orderDate}>{formatIST(tx.date, 'dd MMM yyyy')}</Text>
+                  </TouchableOpacity>
+                ))}
               </View>
             </View>
           </View>
@@ -492,9 +558,10 @@ export default function OwnerDashboardScreen() {
                 </View>
 
                 <TouchableOpacity
-                  onPress={() => toast.info('Export monthly statement')}
+                  onPress={handleExportStatement}
                   style={styles.dotsButton}
                   activeOpacity={0.8}
+                  accessibilityLabel="Export monthly statement"
                 >
                   <MoreVertical size={16} color="#4B5563" />
                 </TouchableOpacity>
@@ -538,50 +605,43 @@ export default function OwnerDashboardScreen() {
             <View style={styles.recentSalesCard}>
               <View style={styles.recentSalesHeader}>
                 <Text style={styles.recentSalesTitle}>Recent Sales</Text>
-                <TouchableOpacity onPress={() => toast.info('Full sales history opens in Transact')}>
+                <TouchableOpacity
+                  onPress={() => setActiveTab('wallet')}
+                  activeOpacity={0.7}
+                >
                   <Text style={styles.seeAllText}>See All</Text>
                 </TouchableOpacity>
               </View>
 
               <View style={styles.salesRowsWrap}>
-                {/* Sale 1: Steven Summer */}
-                <View style={styles.salesRow}>
-                  <Image
-                    source={{ uri: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100' }}
-                    style={salesAvatarStyle}
-                  />
-                  <View style={styles.salesInfo}>
-                    <Text style={styles.salesName}>Steven Summer</Text>
-                    <Text style={styles.salesTime}>02 Minutes Ago</Text>
-                  </View>
-                  <Text style={styles.salesAmount}>+ ₹ 5,200</Text>
-                </View>
-
-                {/* Sale 2: Jordan Maizee */}
-                <View style={styles.salesRow}>
-                  <Image
-                    source={{ uri: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=100' }}
-                    style={salesAvatarStyle}
-                  />
-                  <View style={styles.salesInfo}>
-                    <Text style={styles.salesName}>Jordan Maizee</Text>
-                    <Text style={styles.salesTime}>14 Minutes Ago</Text>
-                  </View>
-                  <Text style={styles.salesAmount}>+ ₹ 14,800</Text>
-                </View>
-
-                {/* Sale 3: Clara Wilson */}
-                <View style={styles.salesRow}>
-                  <Image
-                    source={{ uri: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100' }}
-                    style={salesAvatarStyle}
-                  />
-                  <View style={styles.salesInfo}>
-                    <Text style={styles.salesName}>Clara Wilson</Text>
-                    <Text style={styles.salesTime}>1 Hour Ago</Text>
-                  </View>
-                  <Text style={styles.salesAmount}>+ ₹ 8,500</Text>
-                </View>
+                {transactions
+                  .filter((t) => t.type === 'credit')
+                  .slice(0, 3)
+                  .map((tx) => (
+                    <TouchableOpacity
+                      key={tx.id}
+                      onPress={() => {
+                        lightImpact();
+                        setSelectedTx(tx);
+                      }}
+                      style={styles.salesRow}
+                      activeOpacity={0.7}
+                    >
+                      <Image
+                        source={{
+                          uri:
+                            tx.tenantAvatar ||
+                            'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100',
+                        }}
+                        style={salesAvatarStyle}
+                      />
+                      <View style={styles.salesInfo}>
+                        <Text style={styles.salesName}>{tx.tenantName || tx.title}</Text>
+                        <Text style={styles.salesTime}>{formatIST(tx.date, 'hh:mm a, dd MMM')}</Text>
+                      </View>
+                      <Text style={styles.salesAmount}>+ {formatINR(tx.amountPaise)}</Text>
+                    </TouchableOpacity>
+                  ))}
               </View>
             </View>
           </View>
@@ -597,7 +657,7 @@ export default function OwnerDashboardScreen() {
               {/* Butter Yellow Mini Credit Card / License */}
               <View style={styles.miniCreditCard}>
                 <View style={styles.cardHeaderRow}>
-                  <Text style={styles.cardHolderName}>Amit Kumar</Text>
+                  <Text style={styles.cardHolderName}>{payoutBank.holderName}</Text>
                   {/* Mastercard Double Circle */}
                   <View style={styles.mastercardIcon}>
                     <View style={[styles.mcCircle, { backgroundColor: '#EA580C', opacity: 0.85 }]} />
@@ -625,7 +685,11 @@ export default function OwnerDashboardScreen() {
 
                 {/* 2. Payout to Bank (Card) */}
                 <TouchableOpacity
-                  onPress={() => toast.success('Bank payout scheduled for ₹45,000')}
+                  onPress={() => {
+                    mediumImpact();
+                    setPayoutInput(String(Math.floor(paiseToRupees(balancePaise))));
+                    setIsPayoutModalVisible(true);
+                  }}
                   style={[styles.actionSquare, { backgroundColor: '#B4B8FF' }]}
                   activeOpacity={0.8}
                   accessibilityLabel="Bank Payout"
@@ -635,7 +699,7 @@ export default function OwnerDashboardScreen() {
 
                 {/* 3. Export Statements (Arrow) */}
                 <TouchableOpacity
-                  onPress={() => toast.info('Exporting rental ledger to PDF')}
+                  onPress={handleExportStatement}
                   style={[styles.actionSquare, { backgroundColor: '#C8E2B2' }]}
                   activeOpacity={0.8}
                   accessibilityLabel="Export Statements"
@@ -648,7 +712,7 @@ export default function OwnerDashboardScreen() {
             {/* Big Balance Card */}
             <View style={styles.balanceCard}>
               <Text style={styles.balanceLabel}>Balance</Text>
-              <Text style={styles.balanceAmount}>₹ 54,575</Text>
+              <Text style={styles.balanceAmount}>{formatINR(balancePaise)}</Text>
               <View style={styles.balanceProfitRow}>
                 <TrendingUp size={14} color="#10B981" />
                 <Text style={styles.balanceProfitText}>Total Week Profit +15,32%</Text>
@@ -662,7 +726,7 @@ export default function OwnerDashboardScreen() {
                     <ArrowDownLeft size={13} color="#EF4444" />
                   </View>
                   <Text style={styles.metricLabel}>Spent</Text>
-                  <Text style={styles.metricValue}>₹ 12,454</Text>
+                  <Text style={styles.metricValue}>{formatINR(spentPaise)}</Text>
                 </View>
 
                 {/* Earned */}
@@ -671,16 +735,16 @@ export default function OwnerDashboardScreen() {
                     <ArrowUpRight size={13} color="#10B981" />
                   </View>
                   <Text style={styles.metricLabel}>Earned</Text>
-                  <Text style={styles.metricValue}>₹ 1,60,321</Text>
+                  <Text style={styles.metricValue}>{formatINR(earnedPaise)}</Text>
                 </View>
 
-                {/* Escrow */}
+                {/* Cashback */}
                 <View style={styles.metricItem}>
                   <View style={styles.metricIconCircle}>
                     <Percent size={12} color="#F59E0B" />
                   </View>
                   <Text style={styles.metricLabel}>Cashback</Text>
-                  <Text style={styles.metricValue}>₹ 2,354</Text>
+                  <Text style={styles.metricValue}>{formatINR(cashbackPaise)}</Text>
                 </View>
               </View>
             </View>
@@ -689,64 +753,320 @@ export default function OwnerDashboardScreen() {
             <View style={styles.walletTransactionsCard}>
               <View style={styles.walletTxHeader}>
                 <Text style={styles.walletTxTitle}>Transactions</Text>
-                <TouchableOpacity onPress={() => toast.info('Full transaction analytics')}>
+                <TouchableOpacity
+                  onPress={() => setActiveTab('analytics')}
+                  activeOpacity={0.7}
+                >
                   <Text style={styles.walletAnalyticsLink}>Analytics</Text>
                 </TouchableOpacity>
               </View>
 
               <View style={styles.walletTxList}>
-                {/* Tx 1: Rent from YouTube Music */}
-                <View style={styles.txRow}>
-                  <View style={[styles.txIconCircle, { backgroundColor: '#FDE68A' }]}>
-                    <Music size={16} color="#78350F" />
-                  </View>
-                  <View style={styles.txDetails}>
-                    <Text style={styles.txTitle}>YouTube Music</Text>
-                    <Text style={styles.txTime}>02 Minutes Ago</Text>
-                  </View>
-                  <Text style={[styles.txAmount, { color: '#EF4444' }]}>- ₹ 550</Text>
-                </View>
-
-                {/* Tx 2: Utility Maintenance */}
-                <View style={styles.txRow}>
-                  <View style={[styles.txIconCircle, { backgroundColor: '#FDE68A' }]}>
-                    <ShoppingBag size={16} color="#78350F" />
-                  </View>
-                  <View style={styles.txDetails}>
-                    <Text style={styles.txTitle}>iTunes & Bills</Text>
-                    <Text style={styles.txTime}>13 September 13:27</Text>
-                  </View>
-                  <Text style={[styles.txAmount, { color: '#EF4444' }]}>- ₹ 300</Text>
-                </View>
-
-                {/* Tx 3: Anna Jacobs (Deposit) */}
-                <View style={styles.txRowHighlighted}>
-                  <View style={styles.txDetails}>
-                    <Text style={styles.txTitle}>Anna Jacobs (Deposit)</Text>
-                    <Text style={styles.txTime}>14 September 20:25</Text>
-                  </View>
-                  <Text style={[styles.txAmount, { color: '#10B981' }]}>+ ₹ 23,510</Text>
-                  <View style={styles.txMiniCardIcon}>
-                    <Send size={14} color="#6B7280" />
-                  </View>
-                </View>
-
-                {/* Tx 4: Supermarket Metro */}
-                <View style={styles.txRow}>
-                  <View style={[styles.txIconCircle, { backgroundColor: '#FDE68A' }]}>
-                    <ShoppingBag size={16} color="#78350F" />
-                  </View>
-                  <View style={styles.txDetails}>
-                    <Text style={styles.txTitle}>Supermarket Metro</Text>
-                    <Text style={styles.txTime}>05 Minutes Ago</Text>
-                  </View>
-                  <Text style={[styles.txAmount, { color: '#EF4444' }]}>- ₹ 1,200</Text>
-                </View>
+                {transactions.map((tx, idx) => {
+                  const isCredit = tx.type === 'credit';
+                  return (
+                    <TouchableOpacity
+                      key={tx.id}
+                      onPress={() => {
+                        lightImpact();
+                        setSelectedTx(tx);
+                      }}
+                      style={idx === 2 ? styles.txRowHighlighted : styles.txRow}
+                      activeOpacity={0.7}
+                    >
+                      {idx !== 2 && (
+                        <View style={[styles.txIconCircle, { backgroundColor: '#FDE68A' }]}>
+                          {tx.category === 'utility' ? (
+                            <Music size={16} color="#78350F" />
+                          ) : (
+                            <ShoppingBag size={16} color="#78350F" />
+                          )}
+                        </View>
+                      )}
+                      <View style={styles.txDetails}>
+                        <Text style={styles.txTitle}>{tx.title}</Text>
+                        <Text style={styles.txTime}>{formatIST(tx.date, 'dd MMM, hh:mm a')}</Text>
+                      </View>
+                      <Text
+                        style={[
+                          styles.txAmount,
+                          { color: isCredit ? '#10B981' : '#EF4444' },
+                        ]}
+                      >
+                        {isCredit ? '+ ' : '- '}
+                        {formatINR(tx.amountPaise)}
+                      </Text>
+                      {idx === 2 && (
+                        <View style={styles.txMiniCardIcon}>
+                          <Send size={14} color="#6B7280" />
+                        </View>
+                      )}
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
             </View>
           </View>
         )}
       </ScrollView>
+
+      {/* ─── MODAL 1: Bank Payout Sheet ───────────────────────────────────────── */}
+      <Modal
+        visible={isPayoutModalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setIsPayoutModalVisible(false)}
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={modalStyles.overlay}>
+            <View style={modalStyles.sheetContainer}>
+              {/* Sheet Grabber */}
+              <View style={modalStyles.grabber} />
+
+              {/* Header */}
+              <View style={modalStyles.sheetHeader}>
+                <View>
+                  <Text style={modalStyles.sheetTitle}>Withdraw Rental Revenue</Text>
+                  <Text style={modalStyles.sheetSub}>
+                    Instant IMPS bank transfer to your verified account
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  onPress={() => setIsPayoutModalVisible(false)}
+                  style={modalStyles.closeBtn}
+                >
+                  <X size={18} color="#6B7280" />
+                </TouchableOpacity>
+              </View>
+
+              {/* Bank Account Card */}
+              <View style={modalStyles.bankCard}>
+                <View style={modalStyles.bankIconCircle}>
+                  <Building size={20} color="#1D4ED8" />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <Text style={modalStyles.bankName}>{payoutBank.bankName}</Text>
+                    <View style={modalStyles.verifiedPill}>
+                      <ShieldCheck size={11} color="#059669" />
+                      <Text style={modalStyles.verifiedText}>VERIFIED</Text>
+                    </View>
+                  </View>
+                  <Text style={modalStyles.bankDetails}>
+                    A/C {payoutBank.accountNumberMasked} • IFSC: {payoutBank.ifsc}
+                  </Text>
+                </View>
+              </View>
+
+              {/* Available Balance Banner */}
+              <View style={modalStyles.availWrap}>
+                <Text style={modalStyles.availLabel}>Available Balance:</Text>
+                <Text style={modalStyles.availValue}>{formatINR(balancePaise)}</Text>
+              </View>
+
+              {/* Amount Input */}
+              <View style={modalStyles.amountInputWrap}>
+                <Text style={modalStyles.rupeeSymbol}>₹</Text>
+                <TextInput
+                  style={modalStyles.amountInput}
+                  keyboardType="numeric"
+                  placeholder="Enter amount"
+                  placeholderTextColor="#9CA3AF"
+                  value={payoutInput}
+                  onChangeText={setPayoutInput}
+                />
+              </View>
+
+              {/* Quick Preset Chips */}
+              <View style={modalStyles.presetRow}>
+                {['10000', '25000', String(Math.floor(paiseToRupees(balancePaise)))].map(
+                  (presetVal, idx) => (
+                    <TouchableOpacity
+                      key={presetVal}
+                      onPress={() => {
+                        lightImpact();
+                        setPayoutInput(presetVal);
+                      }}
+                      style={modalStyles.presetChip}
+                      activeOpacity={0.8}
+                    >
+                      <Text style={modalStyles.presetChipText}>
+                        {idx === 2 ? 'All ' : ''}₹{parseInt(presetVal, 10).toLocaleString('en-IN')}
+                      </Text>
+                    </TouchableOpacity>
+                  )
+                )}
+              </View>
+
+              {/* Action Button */}
+              <TouchableOpacity
+                onPress={handleWithdrawConfirm}
+                style={modalStyles.confirmBtn}
+                activeOpacity={0.85}
+              >
+                <Text style={modalStyles.confirmBtnText}>Confirm Instant Withdrawal</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+
+      {/* ─── MODAL 2: Transaction Details Inspection Sheet ────────────────────── */}
+      <Modal
+        visible={!!selectedTx}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setSelectedTx(null)}
+      >
+        <View style={modalStyles.overlay}>
+          <View style={modalStyles.sheetContainer}>
+            <View style={modalStyles.grabber} />
+
+            <View style={modalStyles.sheetHeader}>
+              <View>
+                <Text style={modalStyles.sheetTitle}>Transaction Details</Text>
+                <Text style={modalStyles.sheetSub}>
+                  Ref: {selectedTx?.id.toUpperCase() || 'NEST-TXN-2026'}
+                </Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => setSelectedTx(null)}
+                style={modalStyles.closeBtn}
+              >
+                <X size={18} color="#6B7280" />
+              </TouchableOpacity>
+            </View>
+
+            {selectedTx && (
+              <View style={modalStyles.txDetailBody}>
+                {/* Amount Header */}
+                <View style={modalStyles.txAmountHero}>
+                  <Text
+                    style={[
+                      modalStyles.txHeroNumber,
+                      { color: selectedTx.type === 'credit' ? '#10B981' : '#EF4444' },
+                    ]}
+                  >
+                    {selectedTx.type === 'credit' ? '+' : '-'} {formatINR(selectedTx.amountPaise)}
+                  </Text>
+                  <View style={modalStyles.completedPill}>
+                    <CheckCircle2 size={12} color="#059669" />
+                    <Text style={modalStyles.completedText}>SETTLED VIA ESCROW</Text>
+                  </View>
+                </View>
+
+                {/* Details Table */}
+                <View style={modalStyles.detailRowsWrap}>
+                  <View style={modalStyles.detailRow}>
+                    <Text style={modalStyles.detailRowLabel}>Party / Tenant</Text>
+                    <Text style={modalStyles.detailRowValue}>
+                      {selectedTx.tenantName || selectedTx.title}
+                    </Text>
+                  </View>
+
+                  <View style={modalStyles.detailRow}>
+                    <Text style={modalStyles.detailRowLabel}>Description</Text>
+                    <Text style={modalStyles.detailRowValue}>{selectedTx.subtitle}</Text>
+                  </View>
+
+                  <View style={modalStyles.detailRow}>
+                    <Text style={modalStyles.detailRowLabel}>Date & Time</Text>
+                    <Text style={modalStyles.detailRowValue}>
+                      {formatIST(selectedTx.date, 'EEEE, dd MMM yyyy, hh:mm a')}
+                    </Text>
+                  </View>
+
+                  <View style={modalStyles.detailRow}>
+                    <Text style={modalStyles.detailRowLabel}>Payment Method</Text>
+                    <Text style={modalStyles.detailRowValue}>
+                      {selectedTx.paymentMethod || 'UPI • Direct Transfer'}
+                    </Text>
+                  </View>
+                </View>
+
+                {/* Actions */}
+                <View style={modalStyles.txActionsRow}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      lightImpact();
+                      toast.success('Rent receipt downloaded to device (PDF)');
+                      setSelectedTx(null);
+                    }}
+                    style={modalStyles.downloadBtn}
+                    activeOpacity={0.8}
+                  >
+                    <Download size={16} color="#111827" style={{ marginRight: 6 }} />
+                    <Text style={modalStyles.downloadBtnText}>Receipt PDF</Text>
+                  </TouchableOpacity>
+
+                  {selectedTx.tenantName && (
+                    <TouchableOpacity
+                      onPress={() => {
+                        lightImpact();
+                        setSelectedTx(null);
+                        router.push('/chat/inquiry-1');
+                      }}
+                      style={modalStyles.chatBtn}
+                      activeOpacity={0.8}
+                    >
+                      <MessageSquare size={16} color="#FFFFFF" style={{ marginRight: 6 }} />
+                      <Text style={modalStyles.chatBtnText}>Message</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              </View>
+            )}
+          </View>
+        </View>
+      </Modal>
+
+      {/* ─── MODAL 3: Time Filter Picker ──────────────────────────────────────── */}
+      <Modal
+        visible={isFilterPickerVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setIsFilterPickerVisible(false)}
+      >
+        <TouchableOpacity
+          style={modalStyles.overlayCenter}
+          activeOpacity={1}
+          onPress={() => setIsFilterPickerVisible(false)}
+        >
+          <View style={modalStyles.filterCard}>
+            <Text style={modalStyles.filterCardTitle}>Select Time Window</Text>
+            {(['Every 3 Hours', 'Today', 'This Week', 'This Month', 'All Time'] as const).map(
+              (option) => {
+                const isSelected = selectedTimeFilter === option;
+                return (
+                  <TouchableOpacity
+                    key={option}
+                    onPress={() => {
+                      selectionFeedback();
+                      setTimeFilter(option);
+                      setIsFilterPickerVisible(false);
+                      toast.info(`Time filter updated to ${option}`);
+                    }}
+                    style={[
+                      modalStyles.filterOption,
+                      isSelected && modalStyles.filterOptionSelected,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        modalStyles.filterOptionText,
+                        isSelected && modalStyles.filterOptionTextSelected,
+                      ]}
+                    >
+                      {option}
+                    </Text>
+                    {isSelected && <CheckCircle2 size={16} color="#10B981" />}
+                  </TouchableOpacity>
+                );
+              }
+            )}
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -1408,5 +1728,303 @@ const styles = StyleSheet.create({
   },
   txMiniCardIcon: {
     marginLeft: 8,
+  },
+});
+
+// ─── Modal Stylesheet ─────────────────────────────────────────────────────────
+const modalStyles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.58)',
+    justifyContent: 'flex-end',
+  },
+  overlayCenter: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.45)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  sheetContainer: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    padding: 22,
+    paddingBottom: Platform.OS === 'ios' ? 42 : 28,
+  },
+  grabber: {
+    width: 42,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#E5E7EB',
+    alignSelf: 'center',
+    marginBottom: 16,
+  },
+  sheetHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 18,
+  },
+  sheetTitle: {
+    fontSize: 18,
+    fontFamily: 'PlusJakartaSans_700Bold',
+    color: '#111827',
+  },
+  sheetSub: {
+    fontSize: 12,
+    fontFamily: 'Inter_400Regular',
+    color: '#6B7280',
+    marginTop: 2,
+  },
+  closeBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#F3F4F6',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  bankCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#EFF6FF',
+    borderWidth: 1,
+    borderColor: '#BFDBFE',
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 16,
+  },
+  bankIconCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#DBEAFE',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  bankName: {
+    fontSize: 14,
+    fontFamily: 'PlusJakartaSans_700Bold',
+    color: '#1E3A8A',
+  },
+  verifiedPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#D1FAE5',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+    gap: 3,
+  },
+  verifiedText: {
+    fontSize: 9.5,
+    fontFamily: 'PlusJakartaSans_700Bold',
+    color: '#065F46',
+  },
+  bankDetails: {
+    fontSize: 12,
+    fontFamily: 'Inter_500Medium',
+    color: '#3B82F6',
+    marginTop: 2,
+  },
+  availWrap: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  availLabel: {
+    fontSize: 13,
+    fontFamily: 'Inter_500Medium',
+    color: '#6B7280',
+  },
+  availValue: {
+    fontSize: 16,
+    fontFamily: 'PlusJakartaSans_700Bold',
+    color: '#111827',
+  },
+  amountInputWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: '#111827',
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    marginBottom: 12,
+    backgroundColor: '#FFFFFF',
+  },
+  rupeeSymbol: {
+    fontSize: 22,
+    fontFamily: 'PlusJakartaSans_700Bold',
+    color: '#111827',
+    marginRight: 8,
+  },
+  amountInput: {
+    flex: 1,
+    fontSize: 20,
+    fontFamily: 'PlusJakartaSans_700Bold',
+    color: '#111827',
+    paddingVertical: 4,
+  },
+  presetRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 20,
+  },
+  presetChip: {
+    flex: 1,
+    backgroundColor: '#F3F4F6',
+    paddingVertical: 9,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  presetChipText: {
+    fontSize: 12,
+    fontFamily: 'Inter_600SemiBold',
+    color: '#374151',
+  },
+  confirmBtn: {
+    backgroundColor: '#18191E',
+    height: 50,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  confirmBtnText: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontFamily: 'PlusJakartaSans_700Bold',
+  },
+
+  /* Transaction Detail Sheet */
+  txDetailBody: {
+    gap: 16,
+  },
+  txAmountHero: {
+    alignItems: 'center',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
+  },
+  txHeroNumber: {
+    fontSize: 32,
+    fontFamily: 'PlusJakartaSans_700Bold',
+    letterSpacing: -0.5,
+  },
+  completedPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#D1FAE5',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+    gap: 4,
+    marginTop: 6,
+  },
+  completedText: {
+    fontSize: 10,
+    fontFamily: 'PlusJakartaSans_700Bold',
+    color: '#065F46',
+    letterSpacing: 0.3,
+  },
+  detailRowsWrap: {
+    backgroundColor: '#F9FAFB',
+    borderRadius: 14,
+    padding: 14,
+    gap: 12,
+  },
+  detailRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  detailRowLabel: {
+    fontSize: 12,
+    fontFamily: 'Inter_500Medium',
+    color: '#6B7280',
+  },
+  detailRowValue: {
+    fontSize: 13,
+    fontFamily: 'PlusJakartaSans_600SemiBold',
+    color: '#111827',
+    maxWidth: '65%',
+    textAlign: 'right',
+  },
+  txActionsRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 6,
+  },
+  downloadBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 46,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    backgroundColor: '#FFFFFF',
+  },
+  downloadBtnText: {
+    fontSize: 13.5,
+    fontFamily: 'PlusJakartaSans_600SemiBold',
+    color: '#111827',
+  },
+  chatBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 46,
+    borderRadius: 12,
+    backgroundColor: '#18191E',
+  },
+  chatBtnText: {
+    fontSize: 13.5,
+    fontFamily: 'PlusJakartaSans_600SemiBold',
+    color: '#FFFFFF',
+  },
+
+  /* Filter Picker */
+  filterCard: {
+    width: '88%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 6,
+  },
+  filterCardTitle: {
+    fontSize: 16,
+    fontFamily: 'PlusJakartaSans_700Bold',
+    color: '#111827',
+    marginBottom: 14,
+  },
+  filterOption: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+  },
+  filterOptionSelected: {
+    backgroundColor: '#F3F4F6',
+  },
+  filterOptionText: {
+    fontSize: 14,
+    fontFamily: 'Inter_500Medium',
+    color: '#4B5563',
+  },
+  filterOptionTextSelected: {
+    fontFamily: 'PlusJakartaSans_700Bold',
+    color: '#111827',
   },
 });
