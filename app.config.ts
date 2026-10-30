@@ -60,11 +60,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   extra: {
     eas: {
-      projectId: 'your-eas-project-id',
+      projectId: 'b235088c-bd28-4399-8ba7-503d8b433239',
     },
   },
   updates: {
-    url: 'https://u.expo.dev/your-eas-project-id',
+    url: 'https://u.expo.dev/b235088c-bd28-4399-8ba7-503d8b433239',
   },
   runtimeVersion: {
     policy: 'fingerprint',
