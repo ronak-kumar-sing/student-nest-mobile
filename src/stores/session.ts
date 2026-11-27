@@ -20,6 +20,8 @@ export interface User {
   role: 'student' | 'owner' | null;
 }
 
+export type AuthStatus = 'initializing' | 'signedOut' | 'needsSignup' | 'signedIn';
+
 export interface SessionState {
   /** Currently authenticated user, or `null` if signed out */
   user: User | null;
@@ -32,6 +34,24 @@ export interface SessionState {
 
   /** Whether the user has completed the onboarding flow */
   isOnboarded: boolean;
+
+  /** Non-persisted session lifecycle status */
+  status: AuthStatus;
+
+  /** Pending email being verified during OTP or signup flow */
+  pendingEmail: string | null;
+
+  /** Pending role selected during onboarding */
+  pendingRole: 'student' | 'owner' | null;
+
+  /** Set the auth lifecycle status */
+  setStatus: (status: AuthStatus) => void;
+
+  /** Set pending email during auth flow */
+  setPendingEmail: (email: string | null) => void;
+
+  /** Set pending role during onboarding */
+  setPendingRole: (role: 'student' | 'owner' | null) => void;
 
   /** Set the current user after authentication */
   setUser: (user: User) => void;
@@ -53,6 +73,9 @@ const initialState = {
   role: null,
   isAuthenticated: false,
   isOnboarded: false,
+  status: 'initializing' as AuthStatus,
+  pendingEmail: null,
+  pendingRole: null,
 } as const;
 
 // ─── Store ──────────────────────────────────────────────────────────
@@ -62,27 +85,39 @@ export const useSessionStore = create<SessionState>()(
     (set) => ({
       ...initialState,
 
+      setStatus: (status) => set({ status }),
+
+      setPendingEmail: (pendingEmail) => set({ pendingEmail }),
+
+      setPendingRole: (pendingRole) => set({ pendingRole }),
+
       setUser: (user) =>
         set({
           user,
           role: user.role,
           isAuthenticated: true,
+          status: 'signedIn',
         }),
 
       setRole: (role) =>
         set((state) => ({
           role,
+          pendingRole: role,
           user: state.user ? { ...state.user, role } : null,
         })),
 
       setOnboarded: (value) => set({ isOnboarded: value }),
 
-      logout: () => set({ ...initialState }),
+      logout: () =>
+        set({
+          ...initialState,
+          status: 'signedOut',
+        }),
     }),
     {
       name: 'student-nest-session',
       storage: createJSONStorage(() => zustandStorage),
-      // Only persist these keys — actions are re-created by Zustand
+      // Only persist these keys — status and pending states are non-persisted
       partialize: (state) => ({
         user: state.user,
         role: state.role,
