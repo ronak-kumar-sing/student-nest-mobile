@@ -1,5 +1,7 @@
 # Student Nest mobile
 
+**Live demo:** web version at https://student-nest-mobile.expo.app, backed by the live API at https://student-nest-api-epba.onrender.com (free tier, so the first request after about 15 idle minutes can take up to a minute). The Android APK is built with `eas build --platform android --profile preview`.
+
 The Expo app for Student Nest, a marketplace where students in Indian cities find rooms and PGs near their college and deal with the owner directly, with no broker. Students sign in with an email code, search rooms by city, open a listing, save it and apply to book. Owners see their own listings.
 
 It talks to the NestJS API in [`student-nest-backend`](https://github.com/ronak-kumar-sing/student-nest-backend). Every feature can also run on an in-memory mock backend, so the UI can be worked on without the API.
