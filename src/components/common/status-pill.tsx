@@ -84,6 +84,55 @@ const STATUS_CONFIGS: Record<string, StatusConfig> = {
     icon: Send,
     iconColor: colors.info,
   },
+  paused: {
+    label: 'Paused',
+    badgeClass: 'bg-muted border-border',
+    textClass: 'text-muted-foreground',
+    icon: Clock,
+    iconColor: colors.mutedForeground,
+  },
+  suspended: {
+    label: 'Suspended',
+    badgeClass: 'bg-destructive/15 border-destructive/30',
+    textClass: 'text-destructive',
+    icon: XCircle,
+    iconColor: colors.destructive,
+  },
+  deleted: {
+    label: 'Deleted',
+    badgeClass: 'bg-destructive/15 border-destructive/30',
+    textClass: 'text-destructive',
+    icon: XCircle,
+    iconColor: colors.destructive,
+  },
+  withdrawn: {
+    label: 'Withdrawn',
+    badgeClass: 'bg-muted border-border',
+    textClass: 'text-muted-foreground',
+    icon: XCircle,
+    iconColor: colors.mutedForeground,
+  },
+  expired: {
+    label: 'Expired',
+    badgeClass: 'bg-muted border-border',
+    textClass: 'text-muted-foreground',
+    icon: Clock,
+    iconColor: colors.mutedForeground,
+  },
+  checked_in: {
+    label: 'Checked In',
+    badgeClass: 'bg-info/15 border-info/30',
+    textClass: 'text-info',
+    icon: CheckCircle2,
+    iconColor: colors.info,
+  },
+  completed: {
+    label: 'Completed',
+    badgeClass: 'bg-success/15 border-success/30',
+    textClass: 'text-success',
+    icon: CheckCircle2,
+    iconColor: colors.success,
+  },
 };
 
 export interface StatusPillProps {

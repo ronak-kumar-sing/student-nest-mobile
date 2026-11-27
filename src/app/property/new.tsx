@@ -1,3 +1,4 @@
+// Stays on mocks: the create-listing wizard is not wired to POST /v1/properties yet (see docs/mobile-plan.md §8).
 import React, { useState } from 'react';
 import {
   View,

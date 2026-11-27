@@ -1,3 +1,4 @@
+// Stays on mocks: owner analytics/financials (15) are not wired to the HTTP API yet (see docs/mobile-plan.md §8).
 import React, { useState } from 'react';
 import {
   View,

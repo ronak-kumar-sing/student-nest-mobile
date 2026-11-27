@@ -14,6 +14,8 @@ import {
   Sparkles,
 } from 'lucide-react-native';
 import { useSessionStore } from '@/stores/session';
+import { authApi } from '@/features/auth/api';
+import { getTransportMode } from '@/api/mode';
 import { ReflectiveCard } from '@/components/common/reflective-card';
 import { SpotlightCard } from '@/components/common/spotlight-card';
 import { PeekRating } from '@/components/common/peek-rating';
@@ -21,10 +23,15 @@ import { toast } from '@/components/ui/toast';
 import { colors } from '@/theme/tokens';
 
 export default function OwnerProfileScreen() {
-  const { user, logout, setRole } = useSessionStore();
+  const { user, setRole } = useSessionStore();
+  const isHttp = getTransportMode('auth') === 'http';
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    try {
+      await authApi.signOut();
+    } catch {
+      useSessionStore.getState().logout();
+    }
     router.replace('/(auth)');
   };
 
@@ -152,24 +159,26 @@ export default function OwnerProfileScreen() {
             <ChevronRight size={18} className="text-muted-foreground" />
           </TouchableOpacity>
 
-          {/* Switch Role Option */}
-          <TouchableOpacity
-            onPress={handleSwitchToStudent}
-            className="flex-row items-center justify-between rounded-xl border border-border bg-muted/50 p-4"
-          >
-            <View className="flex-1 flex-row items-center pr-3">
-              <GraduationCap size={20} className="mr-3 text-foreground" />
-              <View>
-                <Text className="font-body-semibold text-sm text-foreground">
-                  Switch to Student View
-                </Text>
-                <Text className="font-body text-xs text-muted-foreground">
-                  Explore rooms and search as a student tenant.
-                </Text>
+          {/* Switch Role Option — hidden in HTTP mode as role switching requires backend support */}
+          {!isHttp && (
+            <TouchableOpacity
+              onPress={handleSwitchToStudent}
+              className="flex-row items-center justify-between rounded-xl border border-border bg-muted/50 p-4"
+            >
+              <View className="flex-1 flex-row items-center pr-3">
+                <GraduationCap size={20} className="mr-3 text-foreground" />
+                <View>
+                  <Text className="font-body-semibold text-sm text-foreground">
+                    Switch to Student View
+                  </Text>
+                  <Text className="font-body text-xs text-muted-foreground">
+                    Explore rooms and search as a student tenant.
+                  </Text>
+                </View>
               </View>
-            </View>
-            <ChevronRight size={18} className="text-muted-foreground" />
-          </TouchableOpacity>
+              <ChevronRight size={18} className="text-muted-foreground" />
+            </TouchableOpacity>
+          )}
 
           {/* Settings */}
           <View className="shadow-elevation-1 overflow-hidden rounded-xl border border-border bg-card">

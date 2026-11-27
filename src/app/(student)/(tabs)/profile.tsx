@@ -14,16 +14,23 @@ import {
   ChevronRight,
 } from 'lucide-react-native';
 import { useSessionStore } from '@/stores/session';
+import { authApi } from '@/features/auth/api';
+import { getTransportMode } from '@/api/mode';
 import { ReflectiveCard } from '@/components/common/reflective-card';
 import { useTranslation } from 'react-i18next';
 import { colors } from '@/theme/tokens';
 
 export default function ProfileScreen() {
   const { t } = useTranslation();
-  const { user, role, logout, setRole } = useSessionStore();
+  const { user, role, setRole } = useSessionStore();
+  const isHttp = getTransportMode('auth') === 'http';
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    try {
+      await authApi.signOut();
+    } catch {
+      useSessionStore.getState().logout();
+    }
     router.replace('/(auth)');
   };
 
@@ -66,22 +73,24 @@ export default function ProfileScreen() {
 
         {/* Menu Sections */}
         <View className="gap-4">
-          {/* Switch Role Option */}
-          <TouchableOpacity
-            onPress={handleSwitchToOwner}
-            className="flex-row items-center justify-between rounded-xl border border-primary/30 bg-primary/5 p-4"
-          >
-            <View className="flex-1 flex-row items-center pr-3">
-              <Building2 size={20} color={colors.primary} className="mr-3" />
-              <View>
-                <Text className="font-body-semibold text-sm text-primary">Become a Room Owner</Text>
-                <Text className="font-body text-xs text-muted-foreground">
-                  Switch to the owner portal to list properties with 0% brokerage.
-                </Text>
+          {/* Switch Role Option — hidden in HTTP mode as backend become-owner flow is not wired yet */}
+          {!isHttp && (
+            <TouchableOpacity
+              onPress={handleSwitchToOwner}
+              className="flex-row items-center justify-between rounded-xl border border-primary/30 bg-primary/5 p-4"
+            >
+              <View className="flex-1 flex-row items-center pr-3">
+                <Building2 size={20} color={colors.primary} className="mr-3" />
+                <View>
+                  <Text className="font-body-semibold text-sm text-primary">Become a Room Owner</Text>
+                  <Text className="font-body text-xs text-muted-foreground">
+                    Switch to the owner portal to list properties with 0% brokerage.
+                  </Text>
+                </View>
               </View>
-            </View>
-            <ChevronRight size={18} color={colors.primary} />
-          </TouchableOpacity>
+              <ChevronRight size={18} color={colors.primary} />
+            </TouchableOpacity>
+          )}
 
           {/* Account Settings */}
           <View className="shadow-elevation-1 overflow-hidden rounded-xl border border-border bg-card">
