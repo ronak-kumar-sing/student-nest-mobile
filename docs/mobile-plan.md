@@ -8,22 +8,22 @@
 
 | # | Feature | Phase | Mobile Status | Backend Status | Notes |
 | --- | --- | --- | --- | --- | --- |
-| 00 | Foundation | M0 | ✅ mock | planned | Scaffold, UI kit, mock core, tab layouts, EAS linked, NativeWind tokens verified |
-| 01 | Auth | M1 | ⏳ planned | planned | Email OTP, phone verify |
-| 02 | Users & Profiles | M1 | ⏳ planned | planned | Profile setup/edit, prefs |
-| 03 | Owner KYC | M2 | ⏳ planned | planned | Document capture flow |
-| 04 | Properties | M2 | ⏳ planned | planned | Listing detail + create wizard |
-| 05 | Search & Discovery | M2 | ⏳ planned | planned | Explore tab, map, filters |
-| 06 | Favorites | M2 | ⏳ planned | planned | Save/unsave, list |
-| 07 | Bookings | M3 | ⏳ planned | planned | Apply, status timeline |
-| 08 | Tours | M3 | ⏳ planned | planned | Request, slot proposal |
-| 09 | Inquiries (Chat) | M3 | ⏳ planned | planned | Realtime messaging |
-| 10 | Notifications | M3 | ⏳ planned | planned | Inbox, FCM, deep links |
-| 11 | Roommates | M4 | ⏳ planned | planned | Profile, matching, requests |
-| 12 | Reviews | M4 | ⏳ planned | planned | Write, edit, reply |
-| 13 | Reports | M5 | ⏳ planned | planned | Report flows, moderation |
-| 14 | Admin | — | ⏳ n/a | planned | Web console only |
-| 15 | Analytics | M6 | ⏳ planned | planned | Owner dashboard |
+| 00 | Foundation | M0 | ✅ mock | local ✅ | Scaffold, UI kit, mock core, tab layouts, EAS linked, NativeWind tokens verified |
+| 01 | Auth | M1 | 🔗 http-ready | local ✅ | Email OTP sign-in/sign-up live; phone verify ⏳ planned (needs native Firebase phone auth) |
+| 02 | Users & Profiles | M1 | 🔨 in-progress | local ✅ | `GET/PATCH /v1/users/me` wired (session + profile setup); edit/prefs screens still mock |
+| 03 | Owner KYC | M2 | ⏳ planned | local ✅ | Document capture flow |
+| 04 | Properties | M2 | 🔗 http-ready | local ✅ | Listing detail + create wizard |
+| 05 | Search & Discovery | M2 | 🔗 http-ready | local ✅ | Explore tab, map, filters |
+| 06 | Favorites | M2 | 🔗 http-ready | local ✅ | Save/unsave, list |
+| 07 | Bookings | M3 | 🔗 http-ready | local ✅ | Apply, status timeline |
+| 08 | Tours | M3 | ⏳ planned | local ✅ | Request, slot proposal |
+| 09 | Inquiries (Chat) | M3 | ⏳ planned | local ✅ | Realtime messaging |
+| 10 | Notifications | M3 | ⏳ planned | local ✅ | Inbox, FCM, deep links |
+| 11 | Roommates | M4 | ⏳ planned | local ✅ | Profile, matching, requests |
+| 12 | Reviews | M4 | ⏳ planned | local ✅ | Write, edit, reply |
+| 13 | Reports | M5 | ⏳ planned | local ✅ | Report flows, moderation |
+| 14 | Admin | — | ⏳ n/a | local ✅ | Web console only |
+| 15 | Analytics | M6 | ⏳ planned | local ✅ | Owner dashboard |
 
 Status legend: ⏳ planned → 🔨 in-progress → ✅ mock → 🔗 http-ready → 🟢 live
 
@@ -182,7 +182,15 @@ Status legend: ⏳ planned → 🔨 in-progress → ✅ mock → 🔗 http-ready
 
 | # | Spec | Question | Answer |
 | --- | --- | --- | --- |
-| — | — | (none yet) | — |
+| a | 05 | RoomCardDto has no amenities or city display name: explore cards hide amenity pills in http mode | Open |
+| b | 05 | Search requires `city` or `near`, so there is no "All cities" option | Open |
+| c | 04 | `billsIncluded` is a list of names, the mock had a paise amount | Open |
+| d | 00 | `nextCursor` is typed `object \| null` in the OpenAPI output (should be `string \| null`); the client treats it as an opaque string | Open |
+| e | 07 | Booking creation needs a verified phone (PHONE_REQUIRED) but Firebase phone auth is not available in the JS SDK/Expo Go path, so new emulator users cannot apply until phone verification is wired or seeded | Open |
+| f | 01 | `POST /v1/auth/signup` requires `acceptedTermsVersion`, but no endpoint exposes the current terms version. The app sends the constant `TERMS_VERSION = '2026-01'` (`src/features/auth/constants.ts`) | Open |
+| g | 01 | Phone verification (`POST /v1/auth/phone/confirm`) reads the phone from the Firebase token, which needs Firebase Phone Auth (native reCAPTCHA/App Check). The phone screen is ⏳ planned in http mode (mock only) | Open |
+| h | 04/05 | Live API returns `publicLocation: {}` (empty object) for seeded listings although the schema marks `lat`/`lng` required. The app does not read it yet (no map) | Open |
+| i | 04/05 | Seeded image URLs point at `http://localhost:9199` (Storage emulator). The Android emulator cannot reach host `localhost`, so images will not load there without a host rewrite or emulator host config | Open |
 
 ---
 
@@ -219,3 +227,66 @@ Status legend: ⏳ planned → 🔨 in-progress → ✅ mock → 🔗 http-ready
 | ChatBubble | `src/features/inquiries/components/chat-bubble.tsx` | M3 |
 | ReviewStars | `src/features/reviews/components/review-stars.tsx` | M4 |
 
+---
+
+## 6. Decision Log
+
+### 2026-11-27 — Firebase JS SDK (Auth Only) & HTTP Layer Architecture
+- **Firebase JS SDK (auth only):** Adopted `firebase@^13.4.0` (JS SDK) with `@react-native-async-storage/async-storage` for persistence (`getReactNativePersistence`), rather than `@react-native-firebase/*`. This allows running in Expo Go and simulators without requiring immediate native rebuilds. Firestore, messaging (FCM), and App Check native SDKs are deferred to later phases.
+- **HTTP Layer:** Implemented a typed `fetch` client in `src/api/http/` backed by types generated from `docs/api/openapi.mobile.json` via `openapi-typescript` (`npm run gen:api`). Dropped `openapi-fetch` in favor of a lean, custom client handling standard ApiError envelopes, single 401 retry with forced token refresh, repeated-key query serialization, and TanStack Query cancellation.
+- **Dynamic Transport Dispatch:** Added `bindTransport` in `src/api/transport.ts` to allow switching between mock and HTTP implementations at runtime via dev settings without app reloads.
+
+---
+
+## 7. Running Against the Local API
+
+1. Copy `.env.example` to `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+2. Start the local backend on port `3000` alongside Firebase emulators:
+   - Auth emulator on `9099`
+   - Firestore emulator on `8080`
+   - Storage emulator on `9199`
+   - Project ID: `student-nest-dev`
+3. Dev OTP:
+   - Entering `000000` bypasses OTP verification only for `*@test.studentnest.app` email addresses when the backend is running with `DEV_OTP_BYPASS=true` against the emulator.
+   - Example: sign in with `asha@test.studentnest.app` and code `000000`; a new email goes through role selection and profile setup (`POST /v1/auth/signup`).
+   - Search is public and needs a city: `GET /v1/search/rooms?city=indore`. The local seed has `bhopal`, `indore` and `pune` (`GET /v1/search/cities`); the explore city chips come from that endpoint.
+4. Android Emulator:
+   - Update `EXPO_PUBLIC_API_URL` to `http://10.0.2.2:3000` and `EXPO_PUBLIC_FIREBASE_AUTH_EMULATOR_HOST` to `10.0.2.2:9099`.
+5. Contract Sync:
+   - When the backend OpenAPI contract updates, copy it to `docs/api/openapi.mobile.json` and regenerate TypeScript types:
+     ```bash
+     npm run gen:api
+     ```
+
+---
+
+## 8. HTTP Wiring Status (2026-11-27)
+
+### Screen & Endpoint Matrix
+
+| Screen | Route | Feature | Wired to HTTP | Endpoints |
+| --- | --- | --- | --- | --- |
+| Explore | `(student)/(tabs)/explore` | Search & Discovery (05) | Yes | `GET /v1/search/rooms`, `GET /v1/search/cities` |
+| Saved | `(student)/(tabs)/saved` | Favorites (06) | Yes | `GET /v1/favorites`, `DELETE /v1/favorites/:propertyId`, `PUT /v1/favorites/:propertyId` |
+| Activity (Bookings) | `(student)/(tabs)/activity` | Bookings (07) | Yes | `GET /v1/bookings` |
+| Booking Detail | `booking/[id]` | Bookings (07) | Yes | `GET /v1/bookings/:id`, `POST /v1/bookings/:id/actions` |
+| Property Detail | `property/[id]` | Properties (04) | Yes | `GET /v1/properties/:id`, `PUT/DELETE /v1/favorites/:id`, `POST /v1/bookings` |
+| Owner Listings | `(owner)/(tabs)/listings` | Properties (04) | Yes | `GET /v1/properties/mine` |
+| Sign in (email) | `(auth)/index`, `login`, `signup`, `email` | Auth (01) | Yes | `POST /v1/auth/otp/email/send` |
+| OTP verify | `(auth)/otp` | Auth (01) | Yes | `POST /v1/auth/otp/email/verify` + Firebase `signInWithCustomToken` |
+| Role + profile setup | `(auth)/role`, `(auth)/profile-setup` | Auth (01), Users (02) | Yes | `POST /v1/auth/signup`, `PATCH /v1/users/me` |
+| Session / auth gate | `_layout.tsx` | Auth (01), Users (02) | Yes | Firebase `onAuthStateChanged` + `GET /v1/users/me` |
+| Profile tabs (sign out) | `(student)/(tabs)/profile`, `(owner)/(tabs)/profile` | Auth (01) | Sign-out only | Firebase `signOut`; local role switch hidden in http mode |
+
+### Still on Mocks
+- **Phone verify (`(auth)/phone`):** ⏳ planned in http mode. Firebase phone auth needs native reCAPTCHA/App Check, which the JS SDK cannot do in Expo Go; the screen shows a "coming soon" notice in http mode and keeps the mock flow in mock mode.
+- **Activity (Tours segment):** Tours feature (08) endpoints not yet wired to HTTP.
+- **Chat (`chat/[threadId]`):** Realtime inquiries/messaging feature (09) endpoints deferred.
+- **Tour Detail (`tour/[id]`):** Tours feature (08) endpoints not yet wired to HTTP.
+- **Student and Owner Inbox:** Messages and notifications feature (09, 10) not yet wired to HTTP.
+- **Owner Dashboard:** Analytics and financials rollups feature (15) not yet wired to HTTP.
+- **Owner Requests (`(owner)/(tabs)/requests`):** Owner bookings/tours review queue (07, 08) not yet wired to HTTP.
+- **Property New (`property/new`):** 8-step create listing wizard not yet wired to `POST /v1/properties`.

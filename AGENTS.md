@@ -75,10 +75,10 @@ Do not swap libraries without updating this file.
 | Server state | **TanStack Query v5** + `@tanstack/query-async-storage-persister` (MMKV-backed) | Query-key factories per feature |
 | Client state | **Zustand** (+ `persist` with MMKV) | Session, UI prefs, filters, dev settings |
 | Storage | `react-native-mmkv` (fast KV), `expo-secure-store` (tokens/sensitive) | |
-| HTTP | `openapi-fetch` + `openapi-typescript` (later). Hand-written types from specs until then. | |
+| HTTP | Typed `fetch` client in `src/api/http/` + `openapi-typescript` types generated from `docs/api/openapi.mobile.json` (`npm run gen:api`), no openapi-fetch | |
 | Mocking | Custom in-memory mock backend (§6 in prompt) + `@faker-js/faker` (seeded) | |
-| Firebase | `@react-native-firebase/app`, `auth`, `firestore`, `messaging`, `app-check` | Dev builds only — no Expo Go |
-| Notifications | `@react-native-firebase/messaging` (FCM), `expo-notifications` (foreground) | |
+| Firebase | `firebase` (Firebase JS SDK, **auth only**) + `@react-native-async-storage/async-storage` for auth persistence via `getReactNativePersistence`; `connectAuthEmulator` when `EXPO_PUBLIC_FIREBASE_AUTH_EMULATOR_HOST` is set | Decision (project owner): JS SDK instead of @react-native-firebase so the app runs in Expo Go and simulators without a native rebuild. Firestore/messaging/App Check native SDKs are deferred. |
+| Notifications | `expo-notifications` (foreground); FCM via @react-native-firebase is deferred | |
 | Maps | `react-native-maps` (Google provider on Android), `expo-location` | Clustering |
 | Media | `expo-image-picker`, `expo-image-manipulator`, `expo-document-picker` | Resize 2000 px max, JPEG 0.8 |
 | Fonts | `expo-font` config plugin + `@expo-google-fonts/plus-jakarta-sans` + `@expo-google-fonts/inter` | Embedded at build time |
@@ -125,11 +125,13 @@ student-nest-mobile/
     │   ├── components/            # feature-specific components
     │   └── screens/               # screen components used by src/app routes
     ├── api/
-    │   ├── client.ts              # http transport
+    │   ├── http/                  # typed fetch client (client.ts, token.ts, types.ts)
     │   ├── errors.ts              # ApiError + error-code → i18n map
     │   ├── pagination.ts          # useInfiniteQuery helpers
-    │   ├── generated/             # openapi-typescript output (later)
-    │   └── mock/                  # mock backend
+    │   ├── generated/             # openapi-typescript output (schema.ts)
+    │   ├── mock/                  # mock backend
+    │   ├── transport.ts           # bindTransport dynamic mode dispatcher
+    │   └── query-client.ts        # shared QueryClient with smart retry
     ├── components/
     │   ├── ui/                    # Reusables primitives (Button, Input, Card, Badge…)
     │   └── common/                # PriceTag, RoomCard, StatusPill, EmptyState, ErrorState…
@@ -222,7 +224,7 @@ Screen → feature/queries.ts (TanStack Query) → feature/api.ts → transport
 
 - The app **never writes to Firestore** and **never stores money as floats**. Money is paise, formatted at the edge.
 - Never show the exact address or contact details unless the API response includes them. Mocks must mimic the reveal rules.
-- Every native dependency is installed with `npx expo install`. No Expo Go — use dev builds.
+- Every native dependency is installed with `npx expo install`. Expo Go is now possible for the JS-only auth path, though dev builds remain the primary target.
 - No hard-coded colors, font sizes, or strings in components: use tokens and i18n.
 - Every list uses FlashList. Every image uses `expo-image`.
 - Switch on `error.code`, never on message text.
