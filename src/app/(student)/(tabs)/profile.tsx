@@ -14,16 +14,24 @@ import {
   ChevronRight,
 } from 'lucide-react-native';
 import { useSessionStore } from '@/stores/session';
+import { authApi } from '@/features/auth/api';
+import { getTransportMode } from '@/api/mode';
 import { ReflectiveCard } from '@/components/common/reflective-card';
 import { useTranslation } from 'react-i18next';
 import { colors } from '@/theme/tokens';
+import { SHOW_DEV_MENU } from '@/lib/dev';
 
 export default function ProfileScreen() {
   const { t } = useTranslation();
-  const { user, role, logout, setRole } = useSessionStore();
+  const { user, role, setRole } = useSessionStore();
+  const isHttp = getTransportMode('auth') === 'http';
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    try {
+      await authApi.signOut();
+    } catch {
+      useSessionStore.getState().logout();
+    }
     router.replace('/(auth)');
   };
 
@@ -36,13 +44,15 @@ export default function ProfileScreen() {
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>
       <View className="flex-row items-center justify-between border-b border-border bg-card px-4 py-3">
         <Text className="font-heading text-h2 text-foreground">{t('tabs.profile')}</Text>
-        <TouchableOpacity
-          onPress={() => router.push('/dev')}
-          className="flex-row items-center rounded-full bg-muted/80 px-2.5 py-1.5"
-        >
-          <Wrench size={13} className="mr-1 text-muted-foreground" />
-          <Text className="font-body-medium text-xs text-muted-foreground">Dev Menu</Text>
-        </TouchableOpacity>
+        {SHOW_DEV_MENU && (
+          <TouchableOpacity
+            onPress={() => router.push('/dev')}
+            className="flex-row items-center rounded-full bg-muted/80 px-2.5 py-1.5"
+          >
+            <Wrench size={13} className="mr-1 text-muted-foreground" />
+            <Text className="font-body-medium text-xs text-muted-foreground">Dev Menu</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       <ScrollView
@@ -66,22 +76,26 @@ export default function ProfileScreen() {
 
         {/* Menu Sections */}
         <View className="gap-4">
-          {/* Switch Role Option */}
-          <TouchableOpacity
-            onPress={handleSwitchToOwner}
-            className="flex-row items-center justify-between rounded-xl border border-primary/30 bg-primary/5 p-4"
-          >
-            <View className="flex-1 flex-row items-center pr-3">
-              <Building2 size={20} color={colors.primary} className="mr-3" />
-              <View>
-                <Text className="font-body-semibold text-sm text-primary">Become a Room Owner</Text>
-                <Text className="font-body text-xs text-muted-foreground">
-                  Switch to the owner portal to list properties with 0% brokerage.
-                </Text>
+          {/* Switch Role Option — hidden in HTTP mode as backend become-owner flow is not wired yet */}
+          {!isHttp && (
+            <TouchableOpacity
+              onPress={handleSwitchToOwner}
+              className="flex-row items-center justify-between rounded-xl border border-primary/30 bg-primary/5 p-4"
+            >
+              <View className="flex-1 flex-row items-center pr-3">
+                <Building2 size={20} color={colors.primary} className="mr-3" />
+                <View>
+                  <Text className="font-body-semibold text-sm text-primary">
+                    Become a Room Owner
+                  </Text>
+                  <Text className="font-body text-xs text-muted-foreground">
+                    Switch to the owner portal to list properties with 0% brokerage.
+                  </Text>
+                </View>
               </View>
-            </View>
-            <ChevronRight size={18} color={colors.primary} />
-          </TouchableOpacity>
+              <ChevronRight size={18} color={colors.primary} />
+            </TouchableOpacity>
+          )}
 
           {/* Account Settings */}
           <View className="shadow-elevation-1 overflow-hidden rounded-xl border border-border bg-card">

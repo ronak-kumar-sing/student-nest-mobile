@@ -1,3 +1,4 @@
+// Stays on mocks: owner analytics/financials (15) are not wired to the HTTP API yet (see docs/mobile-plan.md §8).
 import React, { useState } from 'react';
 import {
   View,
@@ -43,6 +44,7 @@ import { toast } from '@/components/ui/toast';
 import { selectionFeedback, mediumImpact, lightImpact } from '@/lib/haptics';
 import { useOwnerStore, OwnerTransaction } from '@/stores/owner-store';
 import { formatIST } from '@/lib/dates';
+import { SHOW_DEV_MENU } from '@/lib/dev';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -284,7 +286,7 @@ export default function OwnerDashboardScreen() {
       setIsPayoutModalVisible(false);
       setPayoutInput('');
       toast.success(
-        `₹${rupees.toLocaleString('en-IN')} transferred to ${payoutBank.bankName} (${payoutBank.accountNumberMasked}) via instant IMPS.`
+        `₹${rupees.toLocaleString('en-IN')} transferred to ${payoutBank.bankName} (${payoutBank.accountNumberMasked}) via instant IMPS.`,
       );
     } else {
       toast.error(res.message);
@@ -299,10 +301,7 @@ export default function OwnerDashboardScreen() {
   return (
     <SafeAreaView
       edges={['top']}
-      style={[
-        styles.safeArea,
-        { backgroundColor: activeTab === 'wallet' ? '#18191E' : '#F6F6F0' },
-      ]}
+      style={[styles.safeArea, { backgroundColor: activeTab === 'wallet' ? '#18191E' : '#F6F6F0' }]}
     >
       {/* Top Header Bar */}
       <View
@@ -316,10 +315,7 @@ export default function OwnerDashboardScreen() {
       >
         <View>
           <Text
-            style={[
-              styles.portalTitle,
-              { color: activeTab === 'wallet' ? '#FFFFFF' : '#111827' },
-            ]}
+            style={[styles.portalTitle, { color: activeTab === 'wallet' ? '#FFFFFF' : '#111827' }]}
           >
             Owner Portal
           </Text>
@@ -333,24 +329,26 @@ export default function OwnerDashboardScreen() {
           </Text>
         </View>
 
-        <TouchableOpacity
-          onPress={() => router.push('/dev')}
-          style={[
-            styles.devPill,
-            { backgroundColor: activeTab === 'wallet' ? '#272830' : '#EAE9E2' },
-          ]}
-          accessibilityLabel="Open Dev Menu"
-        >
-          <Wrench size={12} color={activeTab === 'wallet' ? '#D1D5DB' : '#4B5563'} />
-          <Text
+        {SHOW_DEV_MENU && (
+          <TouchableOpacity
+            onPress={() => router.push('/dev')}
             style={[
-              styles.devPillText,
-              { color: activeTab === 'wallet' ? '#D1D5DB' : '#4B5563' },
+              styles.devPill,
+              { backgroundColor: activeTab === 'wallet' ? '#272830' : '#EAE9E2' },
             ]}
+            accessibilityLabel="Open Dev Menu"
           >
-            Dev
-          </Text>
-        </TouchableOpacity>
+            <Wrench size={12} color={activeTab === 'wallet' ? '#D1D5DB' : '#4B5563'} />
+            <Text
+              style={[
+                styles.devPillText,
+                { color: activeTab === 'wallet' ? '#D1D5DB' : '#4B5563' },
+              ]}
+            >
+              Dev
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* View Switcher: RubberSegment */}
@@ -372,10 +370,7 @@ export default function OwnerDashboardScreen() {
         />
       </View>
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         {/* ══════════════════════════════════════════════════════════════════════
             VIEW 1: ANALYTICS & WEEKLY PERFORMANCE (Left Screen in Image)
         ══════════════════════════════════════════════════════════════════════ */}
@@ -473,12 +468,7 @@ export default function OwnerDashboardScreen() {
                         </View>
 
                         {/* Day Label */}
-                        <Text
-                          style={[
-                            styles.dayLabelText,
-                            isSelected && styles.dayLabelActive,
-                          ]}
-                        >
+                        <Text style={[styles.dayLabelText, isSelected && styles.dayLabelActive]}>
                           {item.day}
                         </Text>
                       </TouchableOpacity>
@@ -577,7 +567,9 @@ export default function OwnerDashboardScreen() {
                   <Text style={styles.legendLabel}>Direct</Text>
                   <Text style={styles.legendPct}>60%</Text>
                   <View style={styles.progressTrack}>
-                    <View style={[styles.progressFill, { width: '60%', backgroundColor: '#9FA8FF' }]} />
+                    <View
+                      style={[styles.progressFill, { width: '60%', backgroundColor: '#9FA8FF' }]}
+                    />
                   </View>
                 </View>
 
@@ -586,7 +578,9 @@ export default function OwnerDashboardScreen() {
                   <Text style={styles.legendLabel}>Portal</Text>
                   <Text style={styles.legendPct}>24%</Text>
                   <View style={styles.progressTrack}>
-                    <View style={[styles.progressFill, { width: '24%', backgroundColor: '#FDE68A' }]} />
+                    <View
+                      style={[styles.progressFill, { width: '24%', backgroundColor: '#FDE68A' }]}
+                    />
                   </View>
                 </View>
 
@@ -595,7 +589,9 @@ export default function OwnerDashboardScreen() {
                   <Text style={styles.legendLabel}>Offline</Text>
                   <Text style={styles.legendPct}>16%</Text>
                   <View style={styles.progressTrack}>
-                    <View style={[styles.progressFill, { width: '16%', backgroundColor: '#CDE2B8' }]} />
+                    <View
+                      style={[styles.progressFill, { width: '16%', backgroundColor: '#CDE2B8' }]}
+                    />
                   </View>
                 </View>
               </View>
@@ -605,10 +601,7 @@ export default function OwnerDashboardScreen() {
             <View style={styles.recentSalesCard}>
               <View style={styles.recentSalesHeader}>
                 <Text style={styles.recentSalesTitle}>Recent Sales</Text>
-                <TouchableOpacity
-                  onPress={() => setActiveTab('wallet')}
-                  activeOpacity={0.7}
-                >
+                <TouchableOpacity onPress={() => setActiveTab('wallet')} activeOpacity={0.7}>
                   <Text style={styles.seeAllText}>See All</Text>
                 </TouchableOpacity>
               </View>
@@ -637,7 +630,9 @@ export default function OwnerDashboardScreen() {
                       />
                       <View style={styles.salesInfo}>
                         <Text style={styles.salesName}>{tx.tenantName || tx.title}</Text>
-                        <Text style={styles.salesTime}>{formatIST(tx.date, 'hh:mm a, dd MMM')}</Text>
+                        <Text style={styles.salesTime}>
+                          {formatIST(tx.date, 'hh:mm a, dd MMM')}
+                        </Text>
                       </View>
                       <Text style={styles.salesAmount}>+ {formatINR(tx.amountPaise)}</Text>
                     </TouchableOpacity>
@@ -660,8 +655,15 @@ export default function OwnerDashboardScreen() {
                   <Text style={styles.cardHolderName}>{payoutBank.holderName}</Text>
                   {/* Mastercard Double Circle */}
                   <View style={styles.mastercardIcon}>
-                    <View style={[styles.mcCircle, { backgroundColor: '#EA580C', opacity: 0.85 }]} />
-                    <View style={[styles.mcCircle, { backgroundColor: '#FBBF24', marginLeft: -8, opacity: 0.85 }]} />
+                    <View
+                      style={[styles.mcCircle, { backgroundColor: '#EA580C', opacity: 0.85 }]}
+                    />
+                    <View
+                      style={[
+                        styles.mcCircle,
+                        { backgroundColor: '#FBBF24', marginLeft: -8, opacity: 0.85 },
+                      ]}
+                    />
                   </View>
                 </View>
 
@@ -753,10 +755,7 @@ export default function OwnerDashboardScreen() {
             <View style={styles.walletTransactionsCard}>
               <View style={styles.walletTxHeader}>
                 <Text style={styles.walletTxTitle}>Transactions</Text>
-                <TouchableOpacity
-                  onPress={() => setActiveTab('analytics')}
-                  activeOpacity={0.7}
-                >
+                <TouchableOpacity onPress={() => setActiveTab('analytics')} activeOpacity={0.7}>
                   <Text style={styles.walletAnalyticsLink}>Analytics</Text>
                 </TouchableOpacity>
               </View>
@@ -787,12 +786,7 @@ export default function OwnerDashboardScreen() {
                         <Text style={styles.txTitle}>{tx.title}</Text>
                         <Text style={styles.txTime}>{formatIST(tx.date, 'dd MMM, hh:mm a')}</Text>
                       </View>
-                      <Text
-                        style={[
-                          styles.txAmount,
-                          { color: isCredit ? '#10B981' : '#EF4444' },
-                        ]}
-                      >
+                      <Text style={[styles.txAmount, { color: isCredit ? '#10B981' : '#EF4444' }]}>
                         {isCredit ? '+ ' : '- '}
                         {formatINR(tx.amountPaise)}
                       </Text>
@@ -894,7 +888,7 @@ export default function OwnerDashboardScreen() {
                         {idx === 2 ? 'All ' : ''}₹{parseInt(presetVal, 10).toLocaleString('en-IN')}
                       </Text>
                     </TouchableOpacity>
-                  )
+                  ),
                 )}
               </View>
 
@@ -929,10 +923,7 @@ export default function OwnerDashboardScreen() {
                   Ref: {selectedTx?.id.toUpperCase() || 'NEST-TXN-2026'}
                 </Text>
               </View>
-              <TouchableOpacity
-                onPress={() => setSelectedTx(null)}
-                style={modalStyles.closeBtn}
-              >
+              <TouchableOpacity onPress={() => setSelectedTx(null)} style={modalStyles.closeBtn}>
                 <X size={18} color="#6B7280" />
               </TouchableOpacity>
             </View>
@@ -1062,7 +1053,7 @@ export default function OwnerDashboardScreen() {
                     {isSelected && <CheckCircle2 size={16} color="#10B981" />}
                   </TouchableOpacity>
                 );
-              }
+              },
             )}
           </View>
         </TouchableOpacity>

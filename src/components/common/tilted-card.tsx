@@ -17,6 +17,7 @@ import Animated, {
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { selectionFeedback } from '@/lib/haptics';
+import { useThemeColors } from '@/theme/use-theme-colors';
 
 export interface TiltedCardProps {
   imageSrc?: string;
@@ -54,6 +55,8 @@ export function TiltedCard({
 
   // Track layout width & height dynamically for accurate touch tracking
   const [cardDimensions, setCardDimensions] = useState({ width: 340, height: 320 });
+  // Surface colours follow the theme; the static styles below hold the light values.
+  const colors = useThemeColors();
 
   // 3D Tilt shared values
   const rotateX = useSharedValue(restingPitch);
@@ -142,7 +145,7 @@ export function TiltedCard({
       <Animated.View
         style={[
           styles.cardBody,
-          { borderRadius: radius },
+          { borderRadius: radius, backgroundColor: colors.card, borderColor: colors.border },
           animatedCardStyle,
         ]}
       >
@@ -155,7 +158,7 @@ export function TiltedCard({
         >
           {/* Card Image Container */}
           {imageSrc && (
-            <View style={[styles.imageWrapper, { height: imageHeight, borderTopLeftRadius: radius, borderTopRightRadius: radius }]}>
+            <View style={[styles.imageWrapper, { height: imageHeight, borderTopLeftRadius: radius, borderTopRightRadius: radius, backgroundColor: colors.muted }]}>
               <Image
                 source={{ uri: imageSrc }}
                 style={styles.image}
@@ -191,7 +194,7 @@ export function TiltedCard({
           )}
 
           {/* Details & Child Content */}
-          <View style={[styles.contentWrapper, { borderBottomLeftRadius: radius, borderBottomRightRadius: radius }]}>
+          <View style={[styles.contentWrapper, { borderBottomLeftRadius: radius, borderBottomRightRadius: radius, backgroundColor: colors.card }]}>
             {children}
           </View>
         </Pressable>

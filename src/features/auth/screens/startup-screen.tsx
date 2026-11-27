@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -24,28 +24,38 @@ import { useSessionStore } from '@/stores/session';
 import { lightImpact, mediumImpact } from '@/lib/haptics';
 
 export function StartupScreen() {
-  const { isAuthenticated, role, user } = useSessionStore();
-  const [hasNavigated, setHasNavigated] = useState(false);
+  const { status, role, user } = useSessionStore();
+  const [timerFinished, setTimerFinished] = useState(false);
+  const hasNavigatedRef = useRef(false);
 
   // Logo spring and progress indicator
   const logoScale = useSharedValue(0.7);
   const progressWidth = useSharedValue(0);
 
   const navigateToDestination = (targetRoute?: string) => {
-    if (hasNavigated) return;
-    setHasNavigated(true);
+    if (hasNavigatedRef.current) return;
 
     if (targetRoute) {
-      router.replace(targetRoute as any);
+      hasNavigatedRef.current = true;
+      // Callers pass plain route strings; typed routes cannot express that, so cast.
+      router.replace(targetRoute as Parameters<typeof router.replace>[0]);
       return;
     }
 
-    if (isAuthenticated) {
+    if (status === 'initializing') {
+      return;
+    }
+
+    hasNavigatedRef.current = true;
+
+    if (status === 'signedIn') {
       if (role === 'owner') {
         router.replace('/(owner)/(tabs)/dashboard');
       } else {
         router.replace('/(student)/(tabs)/explore');
       }
+    } else if (status === 'needsSignup') {
+      router.replace('/(auth)/role');
     } else {
       router.replace('/(auth)');
     }
@@ -62,12 +72,20 @@ export function StartupScreen() {
     );
 
     const autoTimer = setTimeout(() => {
-      navigateToDestination();
+      setTimerFinished(true);
     }, 3200);
 
     return () => clearTimeout(autoTimer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // When 3.2s timer finished and status is no longer initializing, auto-navigate
+  useEffect(() => {
+    if (timerFinished && status !== 'initializing' && !hasNavigatedRef.current) {
+      navigateToDestination();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [timerFinished, status]);
 
   const animatedLogoStyle = useAnimatedStyle(() => ({
     transform: [{ scale: logoScale.get() }],
@@ -79,18 +97,29 @@ export function StartupScreen() {
 
   const handleGetStarted = () => {
     mediumImpact();
-    navigateToDestination('/(auth)/signup');
+    if (status === 'initializing') {
+      // If still initializing, navigate when ready or to signup
+      navigateToDestination('/(auth)/signup');
+    } else {
+      navigateToDestination();
+    }
   };
 
   const handleSignIn = () => {
     lightImpact();
-    navigateToDestination('/(auth)/login');
+    if (status === 'initializing') {
+      navigateToDestination('/(auth)/login');
+    } else {
+      navigateToDestination();
+    }
   };
 
   const handleSkip = () => {
     lightImpact();
     navigateToDestination();
   };
+
+  const isSignedIn = status === 'signedIn';
 
   return (
     <View style={styles.root}>
@@ -175,7 +204,7 @@ export function StartupScreen() {
             <Animated.View style={[styles.progressBar, animatedProgressStyle]} />
           </View>
 
-          {isAuthenticated ? (
+          {isSignedIn ? (
             <View style={styles.authWelcomeBox}>
               <Text style={styles.authWelcomeTitle}>
                 Welcome back, {user?.displayName || 'Student'}!

@@ -438,6 +438,11 @@ export function addInquiryMessage(
   }
 }
 
+export function addBooking(booking: MockBooking): void {
+  const db = getDB();
+  db.bookings.unshift(booking);
+}
+
 export function updateBookingStatus(
   bookingId: string,
   status: MockBooking['status'],

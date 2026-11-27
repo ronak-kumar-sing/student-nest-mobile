@@ -14,17 +14,25 @@ import {
   Sparkles,
 } from 'lucide-react-native';
 import { useSessionStore } from '@/stores/session';
+import { authApi } from '@/features/auth/api';
+import { getTransportMode } from '@/api/mode';
 import { ReflectiveCard } from '@/components/common/reflective-card';
 import { SpotlightCard } from '@/components/common/spotlight-card';
 import { PeekRating } from '@/components/common/peek-rating';
 import { toast } from '@/components/ui/toast';
 import { colors } from '@/theme/tokens';
+import { SHOW_DEV_MENU } from '@/lib/dev';
 
 export default function OwnerProfileScreen() {
-  const { user, logout, setRole } = useSessionStore();
+  const { user, setRole } = useSessionStore();
+  const isHttp = getTransportMode('auth') === 'http';
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    try {
+      await authApi.signOut();
+    } catch {
+      useSessionStore.getState().logout();
+    }
     router.replace('/(auth)');
   };
 
@@ -37,13 +45,15 @@ export default function OwnerProfileScreen() {
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>
       <View className="flex-row items-center justify-between border-b border-border bg-card px-4 py-3">
         <Text className="font-heading text-h2 text-foreground">Owner Account</Text>
-        <TouchableOpacity
-          onPress={() => router.push('/dev')}
-          className="flex-row items-center rounded-full bg-muted/80 px-2.5 py-1.5"
-        >
-          <Wrench size={13} className="mr-1 text-muted-foreground" />
-          <Text className="font-body-medium text-xs text-muted-foreground">Dev</Text>
-        </TouchableOpacity>
+        {SHOW_DEV_MENU && (
+          <TouchableOpacity
+            onPress={() => router.push('/dev')}
+            className="flex-row items-center rounded-full bg-muted/80 px-2.5 py-1.5"
+          >
+            <Wrench size={13} className="mr-1 text-muted-foreground" />
+            <Text className="font-body-medium text-xs text-muted-foreground">Dev</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       <ScrollView
@@ -88,14 +98,14 @@ export default function OwnerProfileScreen() {
                     <Text className="text-[11px] text-zinc-400">Owner Hospitality Index</Text>
                   </View>
                 </View>
-                <View className="flex-row items-center gap-1 rounded-full bg-emerald-500/15 px-2.5 py-1 border border-emerald-500/30">
+                <View className="flex-row items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/15 px-2.5 py-1">
                   <Sparkles size={11} color="#10B981" />
                   <Text className="text-[11px] font-bold text-emerald-400">4.9 / 5.0</Text>
                 </View>
               </View>
 
               {/* Interactive PeekRating */}
-              <View className="items-center py-2 bg-zinc-900/60 rounded-xl mb-3 border border-white/5">
+              <View className="mb-3 items-center rounded-xl border border-white/5 bg-zinc-900/60 py-2">
                 <PeekRating
                   defaultValue={5}
                   count={5}
@@ -112,19 +122,19 @@ export default function OwnerProfileScreen() {
 
               {/* Verified Owner Stats Row */}
               <View className="flex-row justify-between border-t border-white/10 pt-3">
-                <View className="items-center flex-1">
+                <View className="flex-1 items-center">
                   <Text className="text-[11px] text-zinc-400">Properties</Text>
-                  <Text className="font-heading text-sm text-white mt-0.5">3 Active</Text>
+                  <Text className="mt-0.5 font-heading text-sm text-white">3 Active</Text>
                 </View>
                 <View className="w-[1px] bg-white/10" />
-                <View className="items-center flex-1">
+                <View className="flex-1 items-center">
                   <Text className="text-[11px] text-zinc-400">Response Rate</Text>
-                  <Text className="font-heading text-sm text-white mt-0.5">98%</Text>
+                  <Text className="mt-0.5 font-heading text-sm text-white">98%</Text>
                 </View>
                 <View className="w-[1px] bg-white/10" />
-                <View className="items-center flex-1">
+                <View className="flex-1 items-center">
                   <Text className="text-[11px] text-zinc-400">Avg Time</Text>
-                  <Text className="font-heading text-sm text-white mt-0.5">&lt; 15 mins</Text>
+                  <Text className="mt-0.5 font-heading text-sm text-white">&lt; 15 mins</Text>
                 </View>
               </View>
             </View>
@@ -152,24 +162,26 @@ export default function OwnerProfileScreen() {
             <ChevronRight size={18} className="text-muted-foreground" />
           </TouchableOpacity>
 
-          {/* Switch Role Option */}
-          <TouchableOpacity
-            onPress={handleSwitchToStudent}
-            className="flex-row items-center justify-between rounded-xl border border-border bg-muted/50 p-4"
-          >
-            <View className="flex-1 flex-row items-center pr-3">
-              <GraduationCap size={20} className="mr-3 text-foreground" />
-              <View>
-                <Text className="font-body-semibold text-sm text-foreground">
-                  Switch to Student View
-                </Text>
-                <Text className="font-body text-xs text-muted-foreground">
-                  Explore rooms and search as a student tenant.
-                </Text>
+          {/* Switch Role Option — hidden in HTTP mode as role switching requires backend support */}
+          {!isHttp && (
+            <TouchableOpacity
+              onPress={handleSwitchToStudent}
+              className="flex-row items-center justify-between rounded-xl border border-border bg-muted/50 p-4"
+            >
+              <View className="flex-1 flex-row items-center pr-3">
+                <GraduationCap size={20} className="mr-3 text-foreground" />
+                <View>
+                  <Text className="font-body-semibold text-sm text-foreground">
+                    Switch to Student View
+                  </Text>
+                  <Text className="font-body text-xs text-muted-foreground">
+                    Explore rooms and search as a student tenant.
+                  </Text>
+                </View>
               </View>
-            </View>
-            <ChevronRight size={18} className="text-muted-foreground" />
-          </TouchableOpacity>
+              <ChevronRight size={18} className="text-muted-foreground" />
+            </TouchableOpacity>
+          )}
 
           {/* Settings */}
           <View className="shadow-elevation-1 overflow-hidden rounded-xl border border-border bg-card">

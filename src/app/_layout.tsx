@@ -1,5 +1,6 @@
 import '../global.css';
 import '@/i18n';
+import '@/lib/nativewind-interop';
 import React, { useEffect } from 'react';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -15,7 +16,8 @@ import {
   PlusJakartaSans_600SemiBold,
   PlusJakartaSans_700Bold,
 } from '@expo-google-fonts/plus-jakarta-sans';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { queryClient } from '@/api/query-client';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Toaster } from '@/components/ui/toast';
@@ -26,19 +28,42 @@ import { KeyboardProvider } from 'react-native-keyboard-controller';
 import * as SystemUI from 'expo-system-ui';
 import { NavigationBar } from 'expo-navigation-bar';
 import { Platform } from 'react-native';
+import { AuthGate } from '@/features/auth/components/auth-gate';
+import { useSessionSync } from '@/features/auth/session-sync';
 
 // Prevent splash screen from auto-hiding until assets are loaded
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 2,
-      staleTime: 1000 * 60, // 1 minute
-      gcTime: 1000 * 60 * 30, // 30 minutes
-    },
-  },
-});
+function RootLayoutContent() {
+  useSessionSync();
+
+  return (
+    <>
+      <AuthGate />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="(auth)" options={{ animation: 'fade' }} />
+        <Stack.Screen name="(student)" options={{ animation: 'fade' }} />
+        <Stack.Screen name="(owner)" options={{ animation: 'fade' }} />
+        <Stack.Screen
+          name="property/[id]"
+          options={{ headerShown: false, presentation: 'card' }}
+        />
+        <Stack.Screen
+          name="booking/[id]"
+          options={{ headerShown: false, presentation: 'card' }}
+        />
+        <Stack.Screen name="tour/[id]" options={{ headerShown: false, presentation: 'card' }} />
+        <Stack.Screen
+          name="chat/[threadId]"
+          options={{ headerShown: false, presentation: 'card' }}
+        />
+        <Stack.Screen name="dev" options={{ headerShown: false, presentation: 'modal' }} />
+        <Stack.Screen name="+not-found" options={{ title: 'Oops!' }} />
+      </Stack>
+    </>
+  );
+}
 
 export default function RootLayout() {
   const [interLoaded] = useFonts({
@@ -78,27 +103,7 @@ export default function RootLayout() {
         <KeyboardProvider>
           <QueryClientProvider client={queryClient}>
             <OfflineBanner />
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="index" />
-              <Stack.Screen name="(auth)" options={{ animation: 'fade' }} />
-              <Stack.Screen name="(student)" options={{ animation: 'fade' }} />
-              <Stack.Screen name="(owner)" options={{ animation: 'fade' }} />
-              <Stack.Screen
-                name="property/[id]"
-                options={{ headerShown: false, presentation: 'card' }}
-              />
-              <Stack.Screen
-                name="booking/[id]"
-                options={{ headerShown: false, presentation: 'card' }}
-              />
-              <Stack.Screen name="tour/[id]" options={{ headerShown: false, presentation: 'card' }} />
-              <Stack.Screen
-                name="chat/[threadId]"
-                options={{ headerShown: false, presentation: 'card' }}
-              />
-              <Stack.Screen name="dev" options={{ headerShown: false, presentation: 'modal' }} />
-              <Stack.Screen name="+not-found" options={{ title: 'Oops!' }} />
-            </Stack>
+            <RootLayoutContent />
             <Toaster />
             <StatusBar style="light" />
             {Platform.OS === 'android' && <NavigationBar style="dark" />}

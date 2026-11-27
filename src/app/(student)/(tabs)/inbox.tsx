@@ -1,3 +1,4 @@
+// Stays on mocks: inquiries (09) and notifications (10) are not wired to the HTTP API yet (see docs/mobile-plan.md §8).
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';

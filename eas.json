@@ -19,7 +19,14 @@
       "distribution": "internal",
       "env": {
         "APP_VARIANT": "preview",
-        "EXPO_PUBLIC_API_MODE": "mock"
+        "EXPO_PUBLIC_API_MODE": "http",
+        "EXPO_PUBLIC_API_URL": "https://student-nest-api-epba.onrender.com",
+        "EXPO_PUBLIC_FIREBASE_PROJECT_ID": "student-nest-demo",
+        "EXPO_PUBLIC_FIREBASE_APP_ID": "1:1056367238509:web:98a140252219e1eee4ce64"
+      },
+      "environment": "preview",
+      "android": {
+        "buildType": "apk"
       }
     },
     "production": {
@@ -44,4 +51,3 @@
     }
   }
 }
-

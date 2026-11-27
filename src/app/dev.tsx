@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
+import { Redirect, router } from 'expo-router';
 import { X, RotateCcw, Wifi, WifiOff, Sliders, CheckCircle2 } from 'lucide-react-native';
 import { useDevSettingsStore } from '@/stores/dev-settings';
 import { useSessionStore } from '@/stores/session';
@@ -9,6 +9,7 @@ import { resetDB } from '@/api/mock/db';
 import { toast } from '@/components/ui/toast';
 import { cn } from '@/lib/cn';
 import { colors } from '@/theme/tokens';
+import { SHOW_DEV_MENU } from '@/lib/dev';
 
 const FEATURES = [
   'auth',
@@ -27,7 +28,13 @@ const FEATURES = [
   'analytics',
 ] as const;
 
-export default function DevMenuScreen() {
+/** Outside development builds the route redirects home, so a typed URL can't open it. */
+export default function DevMenuRoute() {
+  if (!SHOW_DEV_MENU) return <Redirect href="/" />;
+  return <DevMenuScreen />;
+}
+
+function DevMenuScreen() {
   const {
     apiModeOverrides,
     mockLatency,
