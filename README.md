@@ -1,6 +1,6 @@
 # Student Nest mobile
 
-**Live demo:** web version at https://student-nest-mobile.expo.app, backed by the live API at https://student-nest-api-epba.onrender.com (free tier, so the first request after about 15 idle minutes can take up to a minute). The Android APK is built with `eas build --platform android --profile preview`.
+**Live demo:** web version at https://student-nest-mobile.expo.app, backed by the live API at https://student-nest-api-epba.onrender.com (free tier, so the first request after about 15 idle minutes can take up to a minute). Android APK (install on an Android phone; allow installs from your browser when asked): https://expo.dev/accounts/ronakkumarsinghs/projects/student-nest-mobile/builds/e61a2ee6-90b9-4ac6-af2b-b006d09f5737. It's built with `eas build --platform android --profile preview`, and was not tested on a device before publishing.
 
 The Expo app for Student Nest, a marketplace where students in Indian cities find rooms and PGs near their college and deal with the owner directly, with no broker. Students sign in with an email code, search rooms by city, open a listing, save it and apply to book. Owners see their own listings.
 
