@@ -86,3 +86,5 @@ Before this refinement the sign-in screen asked for a phone number and password 
 - On the web build, `/profile` and `/inbox` exist in both the student and owner route groups, so those two web URLs are ambiguous. Native tab navigation is not affected.
 - Dark mode follows the system theme on iOS and Android. It has not been checked on a device or simulator yet.
 - Listing photos come from the Storage emulator at `localhost:9199`; the Android emulator cannot reach `localhost` without `10.0.2.2`.
+
+An interview and architecture guide is in [`docs/INTERVIEW.md`](docs/INTERVIEW.md).
