@@ -1,12 +1,5 @@
 import React, { useMemo, useCallback } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-  RefreshControl,
-} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Search, SlidersHorizontal, MapPin, Wrench, Users } from 'lucide-react-native';
@@ -27,6 +20,7 @@ import { flattenPages } from '@/api/pagination';
 import { useCitiesQuery, useInfiniteRoomsQuery } from '../queries';
 import { buildSearchParams, roomCardDtoToViewModel } from '../mappers';
 import type { RoomCardViewModel } from '../types';
+import { SHOW_DEV_MENU } from '@/lib/dev';
 
 export function ExploreScreen() {
   const { t } = useTranslation();
@@ -71,8 +65,8 @@ export function ExploreScreen() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  // Wait for the cities list so the first search uses the real default city
-  // (the API requires `city` or `near`; there is no "all cities" search).
+    // Wait for the cities list so the first search uses the real default city
+    // (the API requires `city` or `near`; there is no "all cities" search).
   } = useInfiniteRoomsQuery(searchParams, { enabled: !isLoadingCities });
 
   useRefreshOnFocus(refetch);
@@ -114,10 +108,7 @@ export function ExploreScreen() {
               </View>
             </View>
 
-            <Text
-              className="mb-1.5 font-body-semibold text-body text-foreground"
-              numberOfLines={1}
-            >
+            <Text className="mb-1.5 font-body-semibold text-body text-foreground" numberOfLines={1}>
               {item.title}
             </Text>
 
@@ -134,9 +125,7 @@ export function ExploreScreen() {
                   {item.genderPolicyLabel}
                 </Text>
               </View>
-              <Text className="font-body text-xs text-muted-foreground">
-                0% Brokerage
-              </Text>
+              <Text className="font-body text-xs text-muted-foreground">0% Brokerage</Text>
             </View>
           </View>
         </TiltedCard>
@@ -158,15 +147,17 @@ export function ExploreScreen() {
               {t('search.subtitle', 'Direct from verified owners • 0% Brokerage')}
             </Text>
           </View>
-          <TouchableOpacity
-            onPress={() => router.push('/dev')}
-            className="flex-row items-center rounded-full bg-muted/80 px-2.5 py-1.5"
-            accessibilityRole="button"
-            accessibilityLabel="Open Dev Menu"
-          >
-            <Wrench size={13} color={colors.mutedForeground} className="mr-1" />
-            <Text className="font-body-medium text-xs text-muted-foreground">Dev</Text>
-          </TouchableOpacity>
+          {SHOW_DEV_MENU && (
+            <TouchableOpacity
+              onPress={() => router.push('/dev')}
+              className="flex-row items-center rounded-full bg-muted/80 px-2.5 py-1.5"
+              accessibilityRole="button"
+              accessibilityLabel="Open Dev Menu"
+            >
+              <Wrench size={13} color={colors.mutedForeground} className="mr-1" />
+              <Text className="font-body-medium text-xs text-muted-foreground">Dev</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Search Bar */}
@@ -213,11 +204,7 @@ export function ExploreScreen() {
           <RoomCardSkeleton />
         </View>
       ) : isError ? (
-        <ErrorState
-          code={getErrorCode(error)}
-          onRetry={() => refetch()}
-          className="flex-1"
-        />
+        <ErrorState code={getErrorCode(error)} onRetry={() => refetch()} className="flex-1" />
       ) : allItems.length === 0 ? (
         <EmptyState
           title={t('search.noResults', 'No rooms found')}

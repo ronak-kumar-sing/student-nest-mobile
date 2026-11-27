@@ -19,6 +19,7 @@ import { getTransportMode } from '@/api/mode';
 import { ReflectiveCard } from '@/components/common/reflective-card';
 import { useTranslation } from 'react-i18next';
 import { colors } from '@/theme/tokens';
+import { SHOW_DEV_MENU } from '@/lib/dev';
 
 export default function ProfileScreen() {
   const { t } = useTranslation();
@@ -43,13 +44,15 @@ export default function ProfileScreen() {
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>
       <View className="flex-row items-center justify-between border-b border-border bg-card px-4 py-3">
         <Text className="font-heading text-h2 text-foreground">{t('tabs.profile')}</Text>
-        <TouchableOpacity
-          onPress={() => router.push('/dev')}
-          className="flex-row items-center rounded-full bg-muted/80 px-2.5 py-1.5"
-        >
-          <Wrench size={13} className="mr-1 text-muted-foreground" />
-          <Text className="font-body-medium text-xs text-muted-foreground">Dev Menu</Text>
-        </TouchableOpacity>
+        {SHOW_DEV_MENU && (
+          <TouchableOpacity
+            onPress={() => router.push('/dev')}
+            className="flex-row items-center rounded-full bg-muted/80 px-2.5 py-1.5"
+          >
+            <Wrench size={13} className="mr-1 text-muted-foreground" />
+            <Text className="font-body-medium text-xs text-muted-foreground">Dev Menu</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       <ScrollView
@@ -82,7 +85,9 @@ export default function ProfileScreen() {
               <View className="flex-1 flex-row items-center pr-3">
                 <Building2 size={20} color={colors.primary} className="mr-3" />
                 <View>
-                  <Text className="font-body-semibold text-sm text-primary">Become a Room Owner</Text>
+                  <Text className="font-body-semibold text-sm text-primary">
+                    Become a Room Owner
+                  </Text>
                   <Text className="font-body text-xs text-muted-foreground">
                     Switch to the owner portal to list properties with 0% brokerage.
                   </Text>

@@ -32,6 +32,7 @@ import { isApiError, ErrorCodes, getErrorMessage } from '@/api/errors';
 import { mediumImpact } from '@/lib/haptics';
 import { toast } from '@/components/ui/toast';
 import { useTranslation } from 'react-i18next';
+import { SHOW_DEV_MENU } from '@/lib/dev';
 
 const AVATAR_1 = require('../../../../assets/avatars/avatar-1-download-free-avatar-illustrations.svg');
 const AVATAR_2 = require('../../../../assets/avatars/avatar-10-download-free-avatar-illustrations.svg');
@@ -41,7 +42,9 @@ interface AuthWelcomeScreenProps {
   initialMode?: 'signin' | 'signup';
 }
 
-export function AuthWelcomeScreen({ initialMode: _initialMode = 'signin' }: AuthWelcomeScreenProps) {
+export function AuthWelcomeScreen({
+  initialMode: _initialMode = 'signin',
+}: AuthWelcomeScreenProps) {
   const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
@@ -144,10 +147,7 @@ export function AuthWelcomeScreen({ initialMode: _initialMode = 'signin' }: Auth
       if (isApiError(err)) {
         if (err.code === ErrorCodes.VALIDATION_FAILED) {
           setEmailError(t(getErrorMessage(err.code)));
-        } else if (
-          err.code === ErrorCodes.RATE_LIMITED ||
-          err.code === ErrorCodes.NETWORK_ERROR
-        ) {
+        } else if (err.code === ErrorCodes.RATE_LIMITED || err.code === ErrorCodes.NETWORK_ERROR) {
           toast.error(t(getErrorMessage(err.code)));
         } else {
           toast.error(t(getErrorMessage(err.code)));
@@ -236,15 +236,17 @@ export function AuthWelcomeScreen({ initialMode: _initialMode = 'signin' }: Auth
           {/* Header Row with Dev Menu shortcut */}
           <View style={styles.topBar}>
             <View />
-            <TouchableOpacity
-              onPress={() => router.push('/dev')}
-              style={styles.devButton}
-              activeOpacity={0.7}
-              accessibilityLabel="Open Dev Menu"
-            >
-              <Wrench size={13} color="rgba(255, 255, 255, 0.7)" />
-              <Text style={styles.devButtonText}>Dev</Text>
-            </TouchableOpacity>
+            {SHOW_DEV_MENU && (
+              <TouchableOpacity
+                onPress={() => router.push('/dev')}
+                style={styles.devButton}
+                activeOpacity={0.7}
+                accessibilityLabel="Open Dev Menu"
+              >
+                <Wrench size={13} color="rgba(255, 255, 255, 0.7)" />
+                <Text style={styles.devButtonText}>Dev</Text>
+              </TouchableOpacity>
+            )}
           </View>
 
           {/* KeyboardAwareScrollView */}
@@ -291,12 +293,8 @@ export function AuthWelcomeScreen({ initialMode: _initialMode = 'signin' }: Auth
 
             {/* Bold Heading */}
             <Animated.View style={[styles.headingContainer, animatedHeadingStyle]}>
-              <Text style={styles.headingText}>
-                Sign in or create{'\n'}an account
-              </Text>
-              <Text style={styles.headingSubtitle}>
-                Zero brokerage student housing marketplace
-              </Text>
+              <Text style={styles.headingText}>Sign in or create{'\n'}an account</Text>
+              <Text style={styles.headingSubtitle}>Zero brokerage student housing marketplace</Text>
             </Animated.View>
 
             {/* Form Card */}
@@ -330,9 +328,7 @@ export function AuthWelcomeScreen({ initialMode: _initialMode = 'signin' }: Auth
                     accessibilityLabel="Email address"
                   />
                 </View>
-                {Boolean(emailError) && (
-                  <Text style={styles.errorText}>{emailError}</Text>
-                )}
+                {Boolean(emailError) && <Text style={styles.errorText}>{emailError}</Text>}
               </View>
 
               {/* Terms Note */}
@@ -385,7 +381,9 @@ export function AuthWelcomeScreen({ initialMode: _initialMode = 'signin' }: Auth
                       <Text style={styles.demoPillEmoji}>🎓</Text>
                       <View style={styles.demoPillTextWrap}>
                         <Text style={styles.demoPillRole}>Student</Text>
-                        <Text style={styles.demoPillName} numberOfLines={1}>Rahul</Text>
+                        <Text style={styles.demoPillName} numberOfLines={1}>
+                          Rahul
+                        </Text>
                       </View>
                     </TouchableOpacity>
 
@@ -397,7 +395,9 @@ export function AuthWelcomeScreen({ initialMode: _initialMode = 'signin' }: Auth
                       <Text style={styles.demoPillEmoji}>🏡</Text>
                       <View style={styles.demoPillTextWrap}>
                         <Text style={styles.demoPillRole}>Owner</Text>
-                        <Text style={styles.demoPillName} numberOfLines={1}>Amit</Text>
+                        <Text style={styles.demoPillName} numberOfLines={1}>
+                          Amit
+                        </Text>
                       </View>
                     </TouchableOpacity>
                   </View>
