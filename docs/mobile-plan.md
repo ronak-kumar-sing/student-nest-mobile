@@ -10,7 +10,7 @@
 | --- | --- | --- | --- | --- | --- |
 | 00 | Foundation | M0 | ✅ mock | local ✅ | Scaffold, UI kit, mock core, tab layouts, EAS linked, NativeWind tokens verified |
 | 01 | Auth | M1 | 🔗 http-ready | local ✅ | Email OTP sign-in/sign-up live; phone verify ⏳ planned (needs native Firebase phone auth) |
-| 02 | Users & Profiles | M1 | 🔨 in-progress | local ✅ | `GET/PATCH /v1/users/me` wired (session + profile setup); edit/prefs screens still mock |
+| 02 | Users & Profiles | M1 | 🔗 http-ready | local ✅ | Profile tab (student + owner) on `GET /v1/users/me`, edit via `PATCH /v1/users/me` (`/profile/edit`), become owner (`POST /v1/users/me/become-owner` + token refresh); notification prefs, avatar, export/delete still planned |
 | 03 | Owner KYC | M2 | ⏳ planned | local ✅ | Document capture flow |
 | 04 | Properties | M2 | 🔗 http-ready | local ✅ | Listing detail + create wizard |
 | 05 | Search & Discovery | M2 | 🔗 http-ready | local ✅ | Explore tab, map, filters |
@@ -19,7 +19,7 @@
 | 08 | Tours | M3 | ⏳ planned | local ✅ | Request, slot proposal |
 | 09 | Inquiries (Chat) | M3 | ⏳ planned | local ✅ | Realtime messaging |
 | 10 | Notifications | M3 | ⏳ planned | local ✅ | Inbox, FCM, deep links |
-| 11 | Roommates | M4 | ⏳ planned | local ✅ | Profile, matching, requests |
+| 11 | Roommates | M4 | 🔗 http-ready | local ✅ | Roommates tab (students): intro + 4-step wizard, ranked matches, hide/show, requests (incoming/outgoing, accept/decline/cancel, contact reveal). Mock store in `src/api/mock/roommates.ts` |
 | 12 | Reviews | M4 | ⏳ planned | local ✅ | Write, edit, reply |
 | 13 | Reports | M5 | ⏳ planned | local ✅ | Report flows, moderation |
 | 14 | Admin | — | ⏳ n/a | local ✅ | Web console only |
@@ -50,7 +50,8 @@ Status legend: ⏳ planned → 🔨 in-progress → ✅ mock → 🔗 http-ready
 | **Explore** | `(student)/(tabs)/explore` | Search bar, filter chips, filter sheet, sort menu, list ↔ map toggle, FlashList of RoomCards, skeletons, empty state, "Find roommates" entry |
 | **Saved** | `(student)/(tabs)/saved` | Favorites grid/list, greyed unavailable, swipe remove |
 | **Activity** | `(student)/(tabs)/activity` | Segmented: Bookings \| Tours. Status-grouped lists. |
-| **Inbox** | `(student)/(tabs)/inbox` | Segmented: Messages \| Notifications. Thread list, unread badges. |
+| **Roommates** | `(student)/(tabs)/roommates` | Intro + wizard (`(student)/roommate-profile`), matches, requests (`(student)/roommate-requests`) |
+| Messages (not a tab) | `(student)/messages` | Former student Inbox tab, opened from Profile → Messages. Segmented: Messages \| Notifications (mock). |
 | **Profile** | `(student)/(tabs)/profile` | Profile view/edit, phone verify, notification prefs, roommate profile, my reviews/reports, language/theme, become owner, data export/delete, help/legal/version |
 
 ### 2.3 Owner Tabs (Specs 03, 04, 07, 08, 15)
@@ -191,6 +192,9 @@ Status legend: ⏳ planned → 🔨 in-progress → ✅ mock → 🔗 http-ready
 | g | 01 | Phone verification (`POST /v1/auth/phone/confirm`) reads the phone from the Firebase token, which needs Firebase Phone Auth (native reCAPTCHA/App Check). The phone screen is ⏳ planned in http mode (mock only) | Open |
 | h | 04/05 | Live API returns `publicLocation: {}` (empty object) for seeded listings although the schema marks `lat`/`lng` required. The app does not read it yet (no map) | Open |
 | i | 04/05 | Seeded image URLs point at `http://localhost:9199` (Storage emulator). The Android emulator cannot reach host `localhost`, so images will not load there without a host rewrite or emulator host config | Open |
+| j | 01 | `GET /v1/auth/demo` and `POST /v1/auth/demo/sign-in` are not in `docs/api/openapi.mobile.json` yet; `src/features/auth/types.ts` had hand-written demo types | Resolved: OpenAPI synced; types now come from `Schemas['DemoStatusDto']` / `Schemas['DemoSignInResponseDto']` |
+| k | 11 | The roommate matches UI asks for the college on each card, but `PublicRoommateDto` has no college (by design, §8b). Cards show "Same college" only when it is a reason; the college appears in the revealed contact after accept | Open |
+| l | 02 | `PATCH /v1/users/me`: can a field (bio, college) be cleared? The app omits empty strings, so a user cannot blank a field once set | Open |
 
 ---
 
