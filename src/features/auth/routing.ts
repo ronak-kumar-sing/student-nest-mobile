@@ -1,6 +1,6 @@
 import type { AuthStatus } from '@/stores/session';
 
-export const SHARED_ROUTES = ['property', 'booking', 'chat', 'tour', 'dev'] as const;
+export const SHARED_ROUTES = ['property', 'booking', 'chat', 'tour', 'dev', 'profile'] as const;
 
 export function isSharedRoute(segment: string | undefined): boolean {
   if (!segment) return false;

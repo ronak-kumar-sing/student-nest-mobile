@@ -1435,6 +1435,112 @@
         ]
       }
     },
+    "/v1/auth/demo": {
+      "get": {
+        "description": "Always available. personas is empty when DEMO_MODE is off.",
+        "operationId": "AuthDemoController_status",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemoStatusDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "RATE_LIMITED: see the Retry-After header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Is one-click demo sign-in available?",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/demo/sign-in": {
+      "post": {
+        "description": "404 NOT_FOUND (like an unknown route) unless DEMO_MODE=true. Returns a Firebase custom token for the fixed demo_student or demo_owner account (created on first use: verified phone; the owner has approved KYC). Call signInWithCustomToken() with it, exactly like POST /auth/otp/email/verify. 10 per minute per IP.",
+        "operationId": "AuthDemoController_signIn",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DemoSignInDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemoSignInResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VALIDATION_FAILED: body or query failed validation (details lists the fields)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN / ACCOUNT_SUSPENDED / KYC_REQUIRED / PHONE_REQUIRED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NOT_FOUND",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "RATE_LIMITED: see the Retry-After header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Sign in as a demo account (public demo only)",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
     "/v1/verification/requests": {
       "post": {
         "description": "One open request per owner: an existing draft is returned with its fields replaced. At most 3 new requests per 24 hours. Masked Aadhaar only.",
@@ -8267,6 +8373,80 @@
         "required": [
           "requestedAt",
           "scheduledFor"
+        ]
+      },
+      "DemoPersona": {
+        "type": "string",
+        "enum": [
+          "student",
+          "owner"
+        ],
+        "description": "Empty when demo mode is off"
+      },
+      "DemoSignInDto": {
+        "type": "object",
+        "properties": {
+          "persona": {
+            "example": "student",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DemoPersona"
+              }
+            ]
+          }
+        },
+        "required": [
+          "persona"
+        ]
+      },
+      "DemoSignInResponseDto": {
+        "type": "object",
+        "properties": {
+          "customToken": {
+            "type": "string",
+            "description": "Pass to signInWithCustomToken(). Valid for one hour; never log it."
+          },
+          "persona": {
+            "example": "student",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DemoPersona"
+              }
+            ]
+          },
+          "uid": {
+            "type": "string",
+            "example": "demo_student"
+          }
+        },
+        "required": [
+          "customToken",
+          "persona",
+          "uid"
+        ]
+      },
+      "DemoStatusDto": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "example": true
+          },
+          "personas": {
+            "type": "array",
+            "example": [
+              "student",
+              "owner"
+            ],
+            "description": "Empty when demo mode is off",
+            "items": {
+              "$ref": "#/components/schemas/DemoPersona"
+            }
+          }
+        },
+        "required": [
+          "enabled",
+          "personas"
         ]
       },
       "DeviceDeletedDto": {

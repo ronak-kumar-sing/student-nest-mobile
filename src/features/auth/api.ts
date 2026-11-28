@@ -2,6 +2,7 @@ import { http } from '@/api/http';
 import { bindTransport } from '@/api/transport';
 import { ApiError, ErrorCodes } from '@/api/errors';
 import { getDB, type MockUser } from '@/api/mock/db';
+import { buildMockUserMeDto } from '@/api/mock/users';
 import { simulateLatency } from '@/api/mock/latency';
 import { shouldInjectError, getInjectedError } from '@/api/mock/errors';
 import { queryClient } from '@/api/query-client';
@@ -19,6 +20,9 @@ import type {
   SignupResponseDto,
   UpdateProfileDto,
   UserMeDto,
+  DemoConfigDto,
+  DemoPersona,
+  DemoSignInResponseDto,
 } from './types';
 
 // ─── HTTP Implementation ───────────────────────────────────────────
@@ -72,42 +76,28 @@ export const httpAuthApi: AuthApi = {
     queryClient.clear();
     useSessionStore.getState().logout();
   },
+
+  async getDemoConfig(signal?: AbortSignal): Promise<DemoConfigDto> {
+    return http.get<DemoConfigDto>('/v1/auth/demo', { auth: 'none', signal });
+  },
+
+  async demoSignIn(persona: DemoPersona): Promise<DemoSignInResponseDto> {
+    const res = await http.post<DemoSignInResponseDto>(
+      '/v1/auth/demo/sign-in',
+      { persona },
+      { auth: 'none' },
+    );
+
+    // Sign in using the custom Firebase token returned by the backend
+    // Never log the custom token
+    await signInWithFirebaseCustomToken(res.customToken);
+    await getCurrentIdToken(true);
+
+    return res;
+  },
 };
 
 // ─── Mock Implementation ────────────────────────────────────────────
-
-function buildMockUserMeDto(mockUser: MockUser, patch?: Partial<UserMeDto>): UserMeDto {
-  return {
-    id: mockUser.id,
-    role: mockUser.role,
-    status: 'active',
-    email: mockUser.email,
-    emailVerified: true,
-    phone: mockUser.phone ?? undefined,
-    phoneVerified: Boolean(mockUser.phone),
-    displayName: mockUser.displayName,
-    // The OpenAPI output types avatarUrl as `object | null` (spec says `type: object, nullable`);
-    // the API actually returns a URL string, so cast the mock string to the generated type.
-    avatarUrl: mockUser.avatarUrl ? (mockUser.avatarUrl as unknown as UserMeDto['avatarUrl']) : null,
-    claims: {
-      role: mockUser.role,
-      status: 'active',
-      kycStatus: mockUser.role === 'owner' ? 'approved' : undefined,
-    },
-    notificationPrefs: {
-      channels: { email: true, sms: false, push: true },
-      types: {},
-    },
-    consents: {
-      termsVersion: '2026-01',
-      acceptedAt: new Date().toISOString(),
-      marketingOptIn: false,
-    },
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    ...patch,
-  };
-}
 
 export const mockAuthApi: AuthApi = {
   async sendEmailOtp(_email: string): Promise<SendOtpResponseDto> {
@@ -221,6 +211,10 @@ export const mockAuthApi: AuthApi = {
     }
 
     if (patch.displayName) target.displayName = patch.displayName;
+    if (patch.gender) target.gender = patch.gender;
+    if (patch.college !== undefined) target.college = patch.college;
+    if (patch.city !== undefined) target.city = patch.city;
+    if (patch.bio !== undefined) target.bio = patch.bio;
 
     return buildMockUserMeDto(target, {
       bio: patch.bio,
@@ -266,6 +260,21 @@ export const mockAuthApi: AuthApi = {
   async signOut(): Promise<void> {
     queryClient.clear();
     useSessionStore.getState().logout();
+  },
+
+  async getDemoConfig(_signal?: AbortSignal): Promise<DemoConfigDto> {
+    return {
+      enabled: false,
+      personas: [],
+    };
+  },
+
+  async demoSignIn(_persona: DemoPersona): Promise<DemoSignInResponseDto> {
+    throw new ApiError({
+      code: ErrorCodes.NOT_FOUND,
+      message: 'Demo mode is not available in mock mode',
+      statusCode: 404,
+    });
   },
 };
 

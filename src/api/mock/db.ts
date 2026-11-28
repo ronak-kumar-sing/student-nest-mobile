@@ -8,6 +8,11 @@ export interface MockUser {
   avatarUrl: string | null;
   phone: string | null;
   isVerified: boolean;
+  phoneVerified?: boolean;
+  gender?: 'male' | 'female' | 'non_binary' | 'undisclosed';
+  college?: string;
+  city?: string;
+  bio?: string;
 }
 
 export interface MockProperty {
@@ -256,6 +261,11 @@ function createInitialDB(): MockDB {
           'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&auto=format&fit=crop&q=80',
         phone: '+919876543210',
         isVerified: true,
+        phoneVerified: true,
+        gender: 'male',
+        college: 'IIPS Indore',
+        city: 'indore',
+        bio: 'Final-year student looking for single or double occupancy near campus.',
       },
       {
         id: 'student-2',
@@ -266,6 +276,11 @@ function createInitialDB(): MockDB {
           'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&auto=format&fit=crop&q=80',
         phone: '+919876543211',
         isVerified: false,
+        phoneVerified: false,
+        gender: 'female',
+        college: 'SGSITS',
+        city: 'indore',
+        bio: 'Pre-final year engineering student. Clean and quiet.',
       },
       {
         id: 'owner-1',
@@ -276,6 +291,10 @@ function createInitialDB(): MockDB {
           'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&auto=format&fit=crop&q=80',
         phone: '+919876543212',
         isVerified: true,
+        phoneVerified: true,
+        gender: 'male',
+        city: 'indore',
+        bio: 'Property owner managing student accommodation in Vijay Nagar.',
       },
       {
         id: 'owner-2',
@@ -286,6 +305,10 @@ function createInitialDB(): MockDB {
           'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&auto=format&fit=crop&q=80',
         phone: '+919876543213',
         isVerified: false,
+        phoneVerified: false,
+        gender: 'female',
+        city: 'indore',
+        bio: 'Homely PG owner offering safe student rooms.',
       },
     ],
     properties,

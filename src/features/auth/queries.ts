@@ -2,12 +2,16 @@ import { useMutation, useQuery, type UseQueryResult } from '@tanstack/react-quer
 import { authApi } from './api';
 import { queryClient } from '@/api/query-client';
 import { useSessionStore } from '@/stores/session';
+import { getTransportMode } from '@/api/mode';
 import type {
   UserMeDto,
   SendOtpResponseDto,
   SignupInput,
   SignupResponseDto,
   UpdateProfileDto,
+  DemoConfigDto,
+  DemoPersona,
+  DemoSignInResponseDto,
 } from './types';
 
 // ─── Query Keys Factory ─────────────────────────────────────────────
@@ -15,6 +19,7 @@ import type {
 export const authKeys = {
   all: ['auth'] as const,
   me: () => [...authKeys.all, 'me'] as const,
+  demo: () => [...authKeys.all, 'demo'] as const,
 };
 
 // ─── Queries ────────────────────────────────────────────────────────
@@ -30,6 +35,28 @@ export function useMe(): UseQueryResult<UserMeDto, Error> {
     queryKey: authKeys.me(),
     queryFn: ({ signal }) => authApi.getMe(signal),
     enabled: isAuthenticated,
+  });
+}
+
+/**
+ * Hook to fetch demo sign-in configuration.
+ * Enabled only when auth transport is in HTTP mode.
+ * Catches errors and treats them as "demo off".
+ */
+export function useDemoConfig(): UseQueryResult<DemoConfigDto, Error> {
+  const isHttp = getTransportMode('auth') === 'http';
+
+  return useQuery({
+    queryKey: authKeys.demo(),
+    queryFn: async ({ signal }) => {
+      try {
+        return await authApi.getDemoConfig(signal);
+      } catch {
+        return { enabled: false, personas: [] };
+      }
+    },
+    enabled: isHttp,
+    retry: false,
   });
 }
 
@@ -83,5 +110,14 @@ export function useUpdateProfile() {
 export function useSignOut() {
   return useMutation<void, Error, void>({
     mutationFn: () => authApi.signOut(),
+  });
+}
+
+/**
+ * Mutation to sign in with a demo persona (student / owner).
+ */
+export function useDemoSignIn() {
+  return useMutation<DemoSignInResponseDto, Error, DemoPersona>({
+    mutationFn: (persona: DemoPersona) => authApi.demoSignIn(persona),
   });
 }
