@@ -7,6 +7,10 @@ export type SignupDto = components['schemas']['SignupDto'];
 export type SignupResponseDto = components['schemas']['SignupResponseDto'];
 export type UpdateProfileDto = components['schemas']['UpdateProfileDto'];
 
+export type DemoPersona = components['schemas']['DemoPersona'];
+export type DemoConfigDto = components['schemas']['DemoStatusDto'];
+export type DemoSignInResponseDto = components['schemas']['DemoSignInResponseDto'];
+
 export interface SendEmailOtpInput {
   email: string;
 }
@@ -30,4 +34,6 @@ export interface AuthApi {
   updateProfile: (patch: UpdateProfileDto) => Promise<UserMeDto>;
   getMe: (signal?: AbortSignal) => Promise<UserMeDto>;
   signOut: () => Promise<void>;
+  getDemoConfig: (signal?: AbortSignal) => Promise<DemoConfigDto>;
+  demoSignIn: (persona: DemoPersona) => Promise<DemoSignInResponseDto>;
 }

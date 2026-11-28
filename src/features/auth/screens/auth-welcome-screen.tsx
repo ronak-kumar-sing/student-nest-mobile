@@ -13,7 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Wrench, ArrowRight, Mail, Sparkles } from 'lucide-react-native';
+import { Wrench, ArrowRight, Mail, Sparkles, GraduationCap, House } from 'lucide-react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { NavigationBar } from 'expo-navigation-bar';
 import Animated, {
@@ -26,7 +26,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { AvatarBubble } from '../components/avatar-bubble';
 import { useSessionStore } from '@/stores/session';
-import { useSendEmailOtp } from '../queries';
+import { useSendEmailOtp, useDemoConfig, useDemoSignIn } from '../queries';
 import { getTransportMode } from '@/api/mode';
 import { isApiError, ErrorCodes, getErrorMessage } from '@/api/errors';
 import { mediumImpact } from '@/lib/haptics';
@@ -52,6 +52,9 @@ export function AuthWelcomeScreen({
 
   const { setUser, setRole, setOnboarded } = useSessionStore();
   const sendEmailOtpMutation = useSendEmailOtp();
+  const { data: demoConfig } = useDemoConfig();
+  const demoSignInMutation = useDemoSignIn();
+  const [loadingPersona, setLoadingPersona] = useState<'student' | 'owner' | null>(null);
 
   const isMock = getTransportMode('auth') === 'mock';
 
@@ -188,6 +191,27 @@ export function AuthWelcomeScreen({
       setOnboarded(true);
       toast.success('Logged in as Amit Kumar (Demo Owner)');
       router.replace('/(owner)/(tabs)/dashboard');
+    }
+  };
+
+  const handleHttpDemoSignIn = async (persona: 'student' | 'owner') => {
+    mediumImpact();
+    setLoadingPersona(persona);
+    try {
+      await demoSignInMutation.mutateAsync(persona);
+      // Session sync and auth gate route by role automatically
+    } catch (err: unknown) {
+      if (isApiError(err)) {
+        if (err.statusCode === 404 || err.code === ErrorCodes.NOT_FOUND) {
+          toast.error(t('demo.errorOff'));
+        } else {
+          toast.error(t(getErrorMessage(err.code)));
+        }
+      } else {
+        toast.error(t('common.error'));
+      }
+    } finally {
+      setLoadingPersona(null);
     }
   };
 
@@ -378,7 +402,7 @@ export function AuthWelcomeScreen({
                       style={styles.demoPill}
                       activeOpacity={0.8}
                     >
-                      <Text style={styles.demoPillEmoji}>🎓</Text>
+                      <GraduationCap size={18} color={DEMO_ICON_COLOR} accessibilityElementsHidden importantForAccessibility="no" />
                       <View style={styles.demoPillTextWrap}>
                         <Text style={styles.demoPillRole}>Student</Text>
                         <Text style={styles.demoPillName} numberOfLines={1}>
@@ -392,7 +416,7 @@ export function AuthWelcomeScreen({
                       style={styles.demoPill}
                       activeOpacity={0.8}
                     >
-                      <Text style={styles.demoPillEmoji}>🏡</Text>
+                      <House size={18} color={DEMO_ICON_COLOR} accessibilityElementsHidden importantForAccessibility="no" />
                       <View style={styles.demoPillTextWrap}>
                         <Text style={styles.demoPillRole}>Owner</Text>
                         <Text style={styles.demoPillName} numberOfLines={1}>
@@ -403,6 +427,70 @@ export function AuthWelcomeScreen({
                   </View>
                 </View>
               )}
+
+              {/* Demo Sign-in Row (HTTP Mode when demo enabled) */}
+              {!isMock && Boolean(demoConfig?.enabled) && (
+                <View style={styles.demoSection}>
+                  <View style={styles.demoHeaderRow}>
+                    <Sparkles size={13} color="#059669" />
+                    <Text style={styles.demoHeaderLabel}>{t('demo.sectionTitle')}</Text>
+                  </View>
+                  <View style={styles.demoButtonsRow}>
+                    {demoConfig?.personas?.includes('student') && (
+                      <TouchableOpacity
+                        onPress={() => handleHttpDemoSignIn('student')}
+                        style={styles.demoPill}
+                        activeOpacity={0.8}
+                        disabled={demoSignInMutation.isPending}
+                        accessibilityRole="button"
+                        accessibilityLabel={t('demo.tryStudent')}
+                      >
+                        {loadingPersona === 'student' ? (
+                          <ActivityIndicator size="small" color="#047857" style={{ marginHorizontal: 'auto' }} />
+                        ) : (
+                          <>
+                            <GraduationCap size={18} color={DEMO_ICON_COLOR} accessibilityElementsHidden importantForAccessibility="no" />
+                            <View style={styles.demoPillTextWrap}>
+                              <Text style={styles.demoPillRole}>{t('demo.tryStudent')}</Text>
+                              <Text style={styles.demoPillName} numberOfLines={1}>
+                                {t('demo.studentRole')}
+                              </Text>
+                            </View>
+                          </>
+                        )}
+                      </TouchableOpacity>
+                    )}
+
+                    {demoConfig?.personas?.includes('owner') && (
+                      <TouchableOpacity
+                        onPress={() => handleHttpDemoSignIn('owner')}
+                        style={styles.demoPill}
+                        activeOpacity={0.8}
+                        disabled={demoSignInMutation.isPending}
+                        accessibilityRole="button"
+                        accessibilityLabel={t('demo.tryOwner')}
+                      >
+                        {loadingPersona === 'owner' ? (
+                          <ActivityIndicator size="small" color="#047857" style={{ marginHorizontal: 'auto' }} />
+                        ) : (
+                          <>
+                            <House size={18} color={DEMO_ICON_COLOR} accessibilityElementsHidden importantForAccessibility="no" />
+                            <View style={styles.demoPillTextWrap}>
+                              <Text style={styles.demoPillRole}>{t('demo.tryOwner')}</Text>
+                              <Text style={styles.demoPillName} numberOfLines={1}>
+                                {t('demo.ownerRole')}
+                              </Text>
+                            </View>
+                          </>
+                        )}
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                  <Text style={[styles.termsText, { marginTop: 10, fontSize: 11 }]}>
+                    {t('demo.disclaimer')}
+                  </Text>
+                </View>
+              )}
             </View>
           </KeyboardAwareScrollView>
         </View>
@@ -410,6 +498,9 @@ export function AuthWelcomeScreen({
     </SafeAreaView>
   );
 }
+
+/** Same green as the demo pill text (this screen has a fixed light card on a dark hero). */
+const DEMO_ICON_COLOR = '#047857';
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -718,9 +809,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 12,
     gap: 8,
-  },
-  demoPillEmoji: {
-    fontSize: 20,
   },
   demoPillTextWrap: {
     flex: 1,
