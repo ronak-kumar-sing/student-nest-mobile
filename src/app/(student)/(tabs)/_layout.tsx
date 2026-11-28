@@ -1,6 +1,6 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
-import { Search, Heart, CalendarClock, MessageSquare, User } from 'lucide-react-native';
+import { Search, Heart, CalendarClock, User, Users } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { colors } from '@/theme/tokens';
 import {
@@ -57,12 +57,12 @@ export default function StudentTabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="activity"
+        name="roommates"
         options={{
-          title: t('tabs.activity'),
+          title: t('tabs.roommates'),
           tabBarIcon: ({ color, focused }) => (
             <GlassTabIcon
-              icon={<CalendarClock size={20} color={color} strokeWidth={focused ? 2.4 : 2} />}
+              icon={<Users size={20} color={color} strokeWidth={focused ? 2.4 : 2} />}
               focused={focused}
               accentColor={colors.primary}
             />
@@ -70,12 +70,12 @@ export default function StudentTabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="inbox"
+        name="activity"
         options={{
-          title: t('tabs.inbox'),
+          title: t('tabs.activity'),
           tabBarIcon: ({ color, focused }) => (
             <GlassTabIcon
-              icon={<MessageSquare size={20} color={color} strokeWidth={focused ? 2.4 : 2} />}
+              icon={<CalendarClock size={20} color={color} strokeWidth={focused ? 2.4 : 2} />}
               focused={focused}
               accentColor={colors.primary}
             />

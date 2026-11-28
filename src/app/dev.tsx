@@ -6,6 +6,7 @@ import { X, RotateCcw, Wifi, WifiOff, Sliders, CheckCircle2 } from 'lucide-react
 import { useDevSettingsStore } from '@/stores/dev-settings';
 import { useSessionStore } from '@/stores/session';
 import { resetDB } from '@/api/mock/db';
+import { resetRoommatesMock } from '@/api/mock/roommates';
 import { toast } from '@/components/ui/toast';
 import { cn } from '@/lib/cn';
 import { colors } from '@/theme/tokens';
@@ -51,6 +52,7 @@ function DevMenuScreen() {
 
   const handleResetData = () => {
     resetDB();
+    resetRoommatesMock();
     toast.success('Mock database reset to initial seeded state (faker.seed(42))');
   };
 

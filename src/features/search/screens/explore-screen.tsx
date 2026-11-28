@@ -248,7 +248,7 @@ export function ExploreScreen() {
                 })}
               </Text>
               <TouchableOpacity
-                onPress={() => router.push('/(student)/(tabs)/activity')}
+                onPress={() => router.push('/(student)/(tabs)/roommates')}
                 className="flex-row items-center"
                 accessibilityRole="button"
                 accessibilityLabel="Find Roommates"
