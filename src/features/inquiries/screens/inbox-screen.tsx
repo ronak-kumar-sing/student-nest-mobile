@@ -1,9 +1,10 @@
 // Stays on mocks: inquiries (09) and notifications (10) are not wired to the HTTP API yet (see docs/mobile-plan.md §8).
+// Shared by the owner Inbox tab and the student Messages screen (Profile → Messages).
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { MessageSquare, Bell, ChevronRight } from 'lucide-react-native';
+import { MessageSquare, Bell, ChevronRight, ArrowLeft } from 'lucide-react-native';
 import { getDB } from '@/api/mock/db';
 import { EmptyState } from '@/components/common/empty-state';
 import { RubberSegment } from '@/components/common/rubber-segment';
@@ -11,7 +12,12 @@ import { formatRelativeIST } from '@/lib/dates';
 import { cn } from '@/lib/cn';
 import { useTranslation } from 'react-i18next';
 
-export default function InboxScreen() {
+interface InboxScreenProps {
+  /** Show a back button (the student screen is pushed on a stack; the owner one is a tab). */
+  showBack?: boolean;
+}
+
+export function InboxScreen({ showBack = false }: InboxScreenProps) {
   const { t } = useTranslation();
   const db = getDB();
   const [activeTab, setActiveTab] = useState<'messages' | 'notifications'>('messages');
@@ -23,7 +29,19 @@ export default function InboxScreen() {
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>
       <View className="border-b border-border bg-card px-4 py-3">
-        <Text className="font-heading text-h2 text-foreground">{t('tabs.inbox')}</Text>
+        <View className="flex-row items-center gap-3">
+          {showBack ? (
+            <TouchableOpacity
+              onPress={() => router.back()}
+              className="h-11 w-11 items-center justify-center rounded-full bg-muted/60"
+              accessibilityRole="button"
+              accessibilityLabel={t('common.back')}
+            >
+              <ArrowLeft size={18} className="text-foreground" />
+            </TouchableOpacity>
+          ) : null}
+          <Text className="font-heading text-h2 text-foreground">{t('tabs.inbox')}</Text>
+        </View>
 
         {/* Segmented Control */}
         {/* Dynamic RubberSegment for Inbox Switching */}

@@ -89,7 +89,7 @@ export default function OwnerTabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="profile"
+        name="account"
         options={{
           title: t('tabs.profile'),
           tabBarIcon: ({ color, focused }) => (
