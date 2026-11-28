@@ -11,4 +11,5 @@ export const queryKeyRoots = {
   properties: 'properties',
   favorites: 'favorites',
   bookings: 'bookings',
+  roommates: 'roommates',
 } as const;
